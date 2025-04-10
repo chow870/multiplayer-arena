@@ -1,0 +1,21 @@
+# Node modules
+node_modules/
+
+# Prisma generated client
+prisma/dev.db
+prisma/dev.db-journal
+prisma/migrations/
+
+# Build output
+dist/
+
+# Env files
+.env
+
+# Logs and misc
+*.log
+*.DS_Store
+
+# Local settings
+.vscode/
+
