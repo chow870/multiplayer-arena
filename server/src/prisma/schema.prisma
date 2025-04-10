@@ -30,12 +30,19 @@ enum TransactionType {
   BET 
 }
 
+enum EmailVerificationType {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
 
 
 model User {
   id            String   @id @default(uuid())
   username      String   @unique
   email         String   @unique
+  emailVerified Boolean @default(false)
   passwordHash  String
 
   // Premium Features
@@ -124,4 +131,14 @@ model Friendship {
   @@unique([senderId, receiverId])
 }
 
+model VerifyEmail {
+  id         String               @id @default(uuid())
+  email      String                @unique
+  otpHashed  String               // better to store hashed OTP
+  expiry     DateTime
+  status     EmailVerificationType @default(PENDING)
+  createdAt  DateTime             @default(now())
+  resolvedAt DateTime?            @updatedAt
 
+  @@index([email, status]) // quick lookups
+}
