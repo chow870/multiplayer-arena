@@ -41,6 +41,13 @@ export const verifyOtpController = async (req: Request, res: Response) => {
         resolvedAt: new Date(),
       },
     })
+    await prisma.user.update({
+      where: { email },
+      data: {
+        emailVerified: true,
+        updatedAt: new Date(),
+      },
+    })
 
     return res.status(200).json({ message: "Email verified successfully" })
 

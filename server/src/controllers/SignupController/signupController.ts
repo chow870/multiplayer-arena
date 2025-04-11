@@ -5,7 +5,8 @@ import prisma from "../../prisma/client"
 
 export const signupController = async (req: Request, res: Response) => {
   try {
-    const { email, username, password } = req.body
+    const {  username,email, password } = req.body
+    console.log("Received signup request:", req.body)
 
     // Check if user exists
     const existingUser = await prisma.user.findUnique({ where: { email } })

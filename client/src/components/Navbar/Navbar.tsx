@@ -1,9 +1,10 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 
-function Navbar() {
+function NavbarMine() {
   return (
-    <div>Navbar</div>
+   <></>
   )
 }
 
-export default Navbar
+export default NavbarMine

@@ -7,12 +7,14 @@ import prisma from "../../prisma/client"
 export const loginController = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body
-
+    console.log("Received login request:", req.body)
     // Find user
     const user = await prisma.user.findUnique({ where: { email } })
+    // Check if user exists
     if (!user) return res.status(404).json({ message: "User not found" })
         
     // If Email not verified Check !!!
+    console.log("user email verified status is ", user.emailVerified)
     if(user.emailVerified == false){
         return res.status(403).json({message:"Email Not verified."})
     }
