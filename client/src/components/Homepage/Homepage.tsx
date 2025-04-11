@@ -1,14 +1,20 @@
-import React from 'react'
-import Logout from '../Login/Logout'
+// src/pages/HomePage.tsx
+import React from 'react';
+import Navbar from '../Navbar/Navbar';
+import ChatSidebar from '../ChatSection/ChatSideBar';
+import MainHome from './MainHome';
 
-function Homepage() {
+
+function HomePage() {
   return (
-    <>
-     <h1>This is the Homepage
-      <Logout/>
-     </h1>
-    </>
-  )
+    <div className="h-screen w-full flex flex-col">
+      <Navbar/>
+      <div className="flex flex-1">
+        <ChatSidebar />
+        <MainHome/>
+      </div>
+    </div>
+  );
 }
 
-export default Homepage
+export default HomePage;

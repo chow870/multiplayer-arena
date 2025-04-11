@@ -44,6 +44,7 @@ model User {
   email         String   @unique
   emailVerified Boolean @default(false)
   passwordHash  String
+  avatarUrl     String?
 
   // Premium Features
   isPremium     Boolean  @default(false)
