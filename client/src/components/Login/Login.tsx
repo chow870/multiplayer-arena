@@ -1,5 +1,8 @@
+
+import { setUser } from '../../context/slices/userSlice';
 import axios from 'axios';
 import React, { ChangeEvent, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 function Login() {
@@ -8,6 +11,7 @@ function Login() {
     const [isError, setIsError] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>("");
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     function SetPassword(e: ChangeEvent<HTMLInputElement>) {
         setPassword(e.target.value);
@@ -22,6 +26,7 @@ function Login() {
 
             if (response.status === 200 || response.status === 201) {
                 localStorage.setItem("jwtToken", response.data.token);
+                dispatch(setUser(response.data.user));
                 navigate("/home");
             }
         } catch (error) {
