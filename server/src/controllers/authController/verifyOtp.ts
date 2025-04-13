@@ -2,7 +2,7 @@
 
 import { Request, Response } from "express"
 import { verifyOtp } from "../../utils/otp"
-import prisma from "../../prisma/client"
+import prisma from "../../prisma/client";
 
 export const verifyOtpController = async (req: Request, res: Response) => {
   try {

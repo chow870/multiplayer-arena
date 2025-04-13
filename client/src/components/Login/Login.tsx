@@ -25,7 +25,7 @@ function Login() {
             const response = await axios.post('/api/v1/login', { email, password });
 
             if (response.status === 200 || response.status === 201) {
-                localStorage.setItem("jwtToken", response.data.token);
+                localStorage.setItem("token", response.data.token);
                 dispatch(setUser(response.data.user));
                 navigate("/home");
             }

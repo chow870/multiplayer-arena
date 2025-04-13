@@ -2,7 +2,7 @@
 import { Request, Response } from "express"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
-import prisma from "../../prisma/client"
+import prisma from "../../prisma/client";
 
 export const loginController = async (req: Request, res: Response) => {
   try {

@@ -35,6 +35,12 @@ enum EmailVerificationType {
   SUCCESS
   FAILED
 }
+enum FriendshipStatus {
+    PENDING
+    ACCEPTED
+    BLOCKED 
+}
+
 
 
 
@@ -125,7 +131,7 @@ model Friendship {
   receiver   User     @relation("ReceivedRequests", fields: [receiverId], references: [id])
   receiverId String
 
-  status     String   @default("pending") // pending, accepted, blocked
+  status     FriendshipStatus  @default(PENDING) // pending, accepted, blocked
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 

@@ -7,12 +7,20 @@ CREATE TYPE "TransactionStatus" AS ENUM ('PENDING', 'ACCEPTED', 'FAILED');
 -- CreateEnum
 CREATE TYPE "TransactionType" AS ENUM ('DEPOSIT', 'WITHDRAW', 'FEE', 'REWARD', 'BET');
 
+-- CreateEnum
+CREATE TYPE "EmailVerificationType" AS ENUM ('PENDING', 'SUCCESS', 'FAILED');
+
+-- CreateEnum
+CREATE TYPE "FriendshipStatus" AS ENUM ('PENDING', 'ACCEPTED', 'BLOCKED');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
     "username" TEXT NOT NULL,
     "email" TEXT NOT NULL,
+    "emailVerified" BOOLEAN NOT NULL DEFAULT false,
     "passwordHash" TEXT NOT NULL,
+    "avatarUrl" TEXT,
     "isPremium" BOOLEAN NOT NULL DEFAULT false,
     "premiumSince" TIMESTAMP(3),
     "gamesPlayed" INTEGER NOT NULL DEFAULT 0,
@@ -68,7 +76,7 @@ CREATE TABLE "Friendship" (
     "id" TEXT NOT NULL,
     "senderId" TEXT NOT NULL,
     "receiverId" TEXT NOT NULL,
-    "status" TEXT NOT NULL DEFAULT 'pending',
+    "status" "FriendshipStatus" NOT NULL DEFAULT 'PENDING',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -76,9 +84,24 @@ CREATE TABLE "Friendship" (
 );
 
 -- CreateTable
+CREATE TABLE "VerifyEmail" (
+    "id" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "otpHashed" TEXT NOT NULL,
+    "expiry" TIMESTAMP(3) NOT NULL,
+    "status" "EmailVerificationType" NOT NULL DEFAULT 'PENDING',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "resolvedAt" TIMESTAMP(3),
+
+    CONSTRAINT "VerifyEmail_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "_BetToUser" (
     "A" TEXT NOT NULL,
-    "B" TEXT NOT NULL
+    "B" TEXT NOT NULL,
+
+    CONSTRAINT "_BetToUser_AB_pkey" PRIMARY KEY ("A","B")
 );
 
 -- CreateIndex
@@ -94,7 +117,10 @@ CREATE UNIQUE INDEX "Wallet_userId_key" ON "Wallet"("userId");
 CREATE UNIQUE INDEX "Friendship_senderId_receiverId_key" ON "Friendship"("senderId", "receiverId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "_BetToUser_AB_unique" ON "_BetToUser"("A", "B");
+CREATE UNIQUE INDEX "VerifyEmail_email_key" ON "VerifyEmail"("email");
+
+-- CreateIndex
+CREATE INDEX "VerifyEmail_email_status_idx" ON "VerifyEmail"("email", "status");
 
 -- CreateIndex
 CREATE INDEX "_BetToUser_B_index" ON "_BetToUser"("B");

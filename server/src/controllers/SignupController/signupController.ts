@@ -1,7 +1,7 @@
 // server/src/controllers/auth/signupController.ts
 import { Request, Response } from "express"
 import bcrypt from "bcrypt"
-import prisma from "../../prisma/client"
+import prisma from "../../prisma/client";
 
 export const signupController = async (req: Request, res: Response) => {
   try {

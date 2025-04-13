@@ -15,7 +15,7 @@ export default function Logout() {
                navigate('/')
 
             }
-            localStorage.removeItem("jwtToken");
+            localStorage.removeItem("token");
             dispatch(clearUser());
             //navigate ot home page plz
             navigate('/')

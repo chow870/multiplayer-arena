@@ -3,11 +3,12 @@
 import { Request, Response } from "express"
 import { generateOtp, hashOtp } from "../../utils/otp"
 import { transporter } from "../../utils/email"
-import prisma from "../../prisma/client"
+import prisma from "../../prisma/client";
 
 export const sendOtpController = async (req: Request, res: Response) => {
   try {
     const { email } = req.body
+    console.log("reached the send otp controller", email)
 
     if (!email) {
       return res.status(400).json({ message: "Email is required" })
