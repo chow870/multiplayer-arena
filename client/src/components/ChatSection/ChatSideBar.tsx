@@ -1,7 +1,8 @@
 // src/components/ChatSidebar.tsx
 import React, { useState } from 'react';
-import FriendRequests from '../DisplayFriends/dispalyFriends';
+import FriendRequests from '../FriendRequests/FriendRequests';
 import SearchUsers from '../SearchUser/SearchUser';
+import DisplayFriends from '../MyFriends/displayFriends';
 
 
 function ChatSidebar() {
@@ -15,6 +16,7 @@ function ChatSidebar() {
                 return (
                     <Section title="Your Friends" goBack={goBack}>
                         <p className="text-gray-600 dark:text-gray-300">Friends list goes here...</p>
+                        <DisplayFriends/>
                     </Section>
                 );
             case 'chats':

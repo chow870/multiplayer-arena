@@ -1,11 +1,48 @@
 // src/components/Navbar.tsx
-import React, { useState } from 'react';
+import { socket } from '../../socket/socket';
+import { connectSocket, disconnectSocket } from '../../context/slices/socketSlice';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { addOnlineUser, removeOnlineUser, setOnlineUsers } from '../../context/slices/onlineUsersSlice';
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
-  const username = "Player123"; // Replace with actual user context
+  // const username = "Player123"; // Replace with actual user context
+  const dispatch = useDispatch();
+  const username = useSelector((state:any) => state.user.username);
+  const userId = useSelector((state:any) => state.user.id);
+  useEffect(() => {
+    // socket.connect();
+    // console.log("Socket connected:", socket.id);
+    // Dispatch an action to update the socket connection status if needed
+  // console.log(" form the navbar userEffect : User ID:", userId); // Debugging line to check user ID
+
+    dispatch(connectSocket());
+    socket.on("connect", () => {
+          console.log("Connected:", socket.id);
+          socket.emit("userConnected", userId); // Replace with actual user ID
+    });
+
+    socket.on("onlineUsers", (userList: string[]) => {
+      dispatch(setOnlineUsers(userList));
+    });
+
+    socket.on("userOnline", (userId: string) => {
+      dispatch(addOnlineUser(userId));
+    });
+
+    socket.on("userOffline", (userId: string) => {
+      dispatch(removeOnlineUser(userId));
+    });
+    return () => {
+      // socket.disconnect();
+      dispatch(disconnectSocket());
+      // console.log("Socket disconnected:", socket.id);
+      // Cleanup function to disconnect the socket when the component unmounts
+    };
+  }, [dispatch]);
 
   return (
     <nav className="w-full bg-black text-white p-4 flex justify-between items-center shadow-md">
