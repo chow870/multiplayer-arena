@@ -3,9 +3,10 @@ import React, { useState } from 'react';
 import FriendRequests from '../FriendRequests/FriendRequests';
 import SearchUsers from '../SearchUser/SearchUser';
 import DisplayFriends from '../MyFriends/displayFriends';
+import MainChat from '../Chats/MainChat';
 
 
-function ChatSidebar() {
+function SideBar() {
     const [activeSection, setActiveSection] = useState<string>('sidebar');
 
     const goBack = () => setActiveSection('sidebar');
@@ -23,6 +24,7 @@ function ChatSidebar() {
                 return (
                     <Section title="Chats" goBack={goBack}>
                         <p className="text-gray-600 dark:text-gray-300">Chat conversations go here...</p>
+                        <MainChat/>
                     </Section>
                 );
             case 'requests':
@@ -100,4 +102,4 @@ function Section({
     );
 }
 
-export default ChatSidebar;
+export default SideBar;

@@ -17,12 +17,12 @@ function Navbar() {
     // socket.connect();
     // console.log("Socket connected:", socket.id);
     // Dispatch an action to update the socket connection status if needed
-  // console.log(" form the navbar userEffect : User ID:", userId); // Debugging line to check user ID
+  console.log(" form the navbar userEffect : User ID:", localStorage.getItem("userId")); // Debugging line to check user ID
 
     dispatch(connectSocket());
     socket.on("connect", () => {
           console.log("Connected:", socket.id);
-          socket.emit("userConnected", userId); // Replace with actual user ID
+          socket.emit("userConnected", localStorage.getItem("userId")); // Replace with actual user ID
     });
 
     socket.on("onlineUsers", (userList: string[]) => {

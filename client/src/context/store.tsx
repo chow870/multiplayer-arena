@@ -3,6 +3,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import userReducer from "./slices/userSlice";
 import socketReducer from "./slices/socketSlice"; // Assuming you have a socket slice
 import onlineUsersReducer from "./slices/onlineUsersSlice"; // Assuming you have an online users slice
+import selectedChatReducer from "./slices/selectedRoomChatsSlice"; // Assuming you have a selected chat slice
 import { on } from "events";
 // import { socket } from "@/socket/socket";
 
@@ -10,7 +11,8 @@ export const store = configureStore({
   reducer: {
     user: userReducer,
     socket: socketReducer, // Assuming you have a socket slice
-    onlineUsers:onlineUsersReducer
+    onlineUsers:onlineUsersReducer,
+    selectChat : selectedChatReducer, // Assuming you have a selected chat slice
   },
 });
 

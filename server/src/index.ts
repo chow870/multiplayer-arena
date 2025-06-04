@@ -12,6 +12,7 @@ import { authenticateToken } from './middlewares/authMiddleware';
 import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import{ClientToServerEvents, ServerToClientEvents} from './sockets/types';
+import chatFriendsRouter from './routes/chatsRoutes/chatsRouters';
 
 const app:Express = express();
 const httpServer = http.createServer(app);
@@ -35,6 +36,7 @@ app.use('/api/v1/add-friend',AddFriendRouter);
 app.use('/api/v1/search-users',UserSearchRouter);
 app.use('/api/v1/friendships',DisplayFriendsRouter);
 app.use('/api/v1/friend-request',FriendRequestRouter);
+app.use('/api/v1/chats',chatFriendsRouter );
 
 
 // socket connections
@@ -54,6 +56,33 @@ io.on("connection", (socket) => {
     const users = [...onlineUsers.values()];
     socket.emit("onlineUsers", users);
   });
+
+  // Handle user joining and leaving rooms
+  // also the message sending logic
+
+  socket.on("joinRoom", (roomId) => {
+    socket.join(roomId);
+    console.log(`[socket event 'joinRoom'] User${socket.data.userId} joined room ${roomId}`);
+  });
+
+  socket.on("leaveRoom", (roomId) => {
+    socket.leave(roomId);
+    console.log(`[socket event 'leave'] User${socket.data.userId} User left room ${roomId}`);
+  });
+
+  socket.on("sendMessage", ({ user, roomId, message }) => {
+    console.log(`[socket event 'sendMessage'] from ${user} in room ${roomId}: ${message}`);
+    const payload = {
+      id:roomId,
+      sendId:user,
+      message,
+      timestamp: new Date().toISOString(),
+    };
+
+    // Broadcast to everyone in the room except sender
+    socket.to(roomId).emit("receiveMessage", payload);
+  });
+
 
   socket.on("disconnect", () => {
     const userId = socket.data.userId;

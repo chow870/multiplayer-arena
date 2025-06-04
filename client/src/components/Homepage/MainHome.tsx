@@ -4,8 +4,8 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 export default function MainHome() {
-  const username = useSelector((state: any) => state.user.username); // Assuming you have a user slice in your Redux store
-  const userId = useSelector((state: any) => state.user.id); // Assuming you have a user ID in your Redux store
+  const username = localStorage.getItem("username"); // Assuming you have a user slice in your Redux store
+  const userId = localStorage.getItem('userId') // Assuming you have a user ID in your Redux store
   const navigate = useNavigate();
 
   return (

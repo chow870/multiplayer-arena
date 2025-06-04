@@ -1,11 +1,12 @@
 // src/pages/HomePage.tsx
 import React, { useEffect } from 'react';
 import Navbar from '../Navbar/Navbar';
-import ChatSidebar from '../ChatSection/ChatSideBar';
+// import ChatSidebar from '../SideBar/SideBar';
 import MainHome from './MainHome';
 import { socket } from '../../socket/socket';
 import { useDispatch } from 'react-redux';
 import { connectSocket, disconnectSocket } from '../../context/slices/socketSlice';
+import SideBar from '../SideBar/SideBar';
 
 
 function HomePage() {
@@ -14,7 +15,7 @@ function HomePage() {
     <div className="h-screen w-full flex flex-col">
       <Navbar/>
       <div className="flex flex-1">
-        <ChatSidebar />
+        <SideBar />
         <MainHome/>
       </div>
     </div>

@@ -26,6 +26,8 @@ function Login() {
 
             if (response.status === 200 || response.status === 201) {
                 localStorage.setItem("token", response.data.token);
+                localStorage.setItem("userId", response.data.user.id); // it is important to store the userId beacuse my state is gettng refreshed on every page reload
+                localStorage.setItem("username", response.data.user.username); // Store username if needed
                 dispatch(setUser(response.data.user));
                 navigate("/home");
             }
