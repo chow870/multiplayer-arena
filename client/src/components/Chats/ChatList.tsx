@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
-import { clearActiveRoom, setActiveRoom } from '../../context/slices/selectedRoomChatsSlice'; // Adjust the import path as necessary
+import { clearActiveRoom, setActiveRoom } from '../../context/slices/chatsSelectedRoomSlice'; // Adjust the import path as necessary
 
 // Define the structure for friends
 interface Friends {

@@ -5,7 +5,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = "postgresql://neondb_owner:npg_GOi3FIMhx4nD@ep-quiet-leaf-a5ukvqbf-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require"
-}
+}             
 
 enum UserStatus {
   ONLINE
@@ -41,47 +41,60 @@ enum FriendshipStatus {
     BLOCKED 
 }
 
+enum LobbyStatus {
+  WAITING
+  ACTIVE
+  COMPLETED
+  EXPIRED
+  ABORTED
+}
+
 
 
 
 model User {
-  id            String   @id @default(uuid())
-  username      String   @unique
-  email         String   @unique
-  emailVerified Boolean  @default(false)
-  passwordHash  String
-  avatarUrl     String?
+  id              String          @id @default(uuid())
+  username        String          @unique
+  email           String          @unique
+  emailVerified   Boolean         @default(false)
+  passwordHash    String
+  avatarUrl       String?
 
   // Premium Features
-  isPremium     Boolean  @default(false)
-  premiumSince  DateTime?
+  isPremium       Boolean         @default(false)
+  premiumSince    DateTime?
 
   // Wallet
-  wallet        Wallet?
+  wallet          Wallet?
 
   // Game Stats
-  gamesPlayed   Int      @default(0)
-  gamesWon      Int      @default(0)
-  gamesLost     Int      @default(0)
-  rating        Int      @default(0)
+  gamesPlayed     Int             @default(0)
+  gamesWon        Int             @default(0)
+  gamesLost       Int             @default(0)
+  rating          Int             @default(0)
 
   // Game Matching
-  status        UserStatus   @default(OFFLINE) 
+  status          UserStatus      @default(OFFLINE) 
 
   // Friends
-  sentRequests     Friendship[] @relation("SentRequests")
-  receivedRequests Friendship[] @relation("ReceivedRequests")
+  sentRequests     Friendship[]   @relation("SentRequests")
+  receivedRequests Friendship[]   @relation("ReceivedRequests")
 
   // Chat
-  messages         Message[]    @relation("UserMessages")
+  messages         Message[]      @relation("UserMessages")
 
   // Betting and Transactions
   transactions     Transaction[]
   bets             Bet[]
 
   // Timestamps
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  // Relations
+  createdLobbies   WaitingLobby[] @relation("CreatedLobbies")
+  wonGames         GameRecord[]   @relation("WonGames")
+  gameRecords      GameRecord[]   @relation("UserGameRecords")
 }
 
 model Message {
@@ -158,6 +171,36 @@ model VerifyEmail {
   resolvedAt DateTime?            @updatedAt
 
   @@index([email, status]) // quick lookups
+}
+
+model WaitingLobby {
+  id              String        @id @default(cuid())
+  createdById     String
+  invitedUserIds  String[]      // List of user IDs invited to this lobby
+  status          LobbyStatus   @default(WAITING)
+  createdAt       DateTime      @default(now())
+  expiresAt       DateTime
+  gameLobbyId     String? 
+  // joinedUserIds   String[]      @default([])  // Users who have joined
+  createdBy       User          @relation("CreatedLobbies", fields: [createdById], references: [id])
+  
+}
+
+model GameRecord {
+  id              String      @id @default(cuid())
+  gameType        String      // e.g., "snakes_ladders"
+  winnerId        String?     // Optional until game ends
+  playerId        String      // The player who owns this record
+  invitedUserIds  String[]
+  // joinedUserIds   String[]    @default([]) // Added for tracking
+
+  createdAt       DateTime    @default(now())
+  endedAt         DateTime?   // Optional until game ends
+  currentState    Json        // Serialized state, type varies by game
+  currentTurn     Int?        // User ID of the current player
+  gameState       LobbyStatus @default(WAITING)
+  winner          User?       @relation("WonGames", fields: [winnerId], references: [id])
+  player          User        @relation("UserGameRecords", fields: [playerId], references: [id])
 }
 
 

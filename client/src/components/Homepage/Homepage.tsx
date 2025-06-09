@@ -13,7 +13,7 @@ function HomePage() {
   // here i wiil use the socket connection to set the user online status and to emit the socket event connectedd
   return (
     <div className="h-screen w-full flex flex-col">
-      <Navbar/>
+      {/* <Navbar/> */}
       <div className="flex flex-1">
         <SideBar />
         <MainHome/>

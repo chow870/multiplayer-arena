@@ -1,35 +1,44 @@
 
+import axios from 'axios';
 import React from 'react'
+import { useSelector } from 'react-redux'
 
 function SinglePlayer() {
+     const selectedGame = useSelector((state: any) => state.selectedGameRecord.selectedGameId);
+        const gameMode = useSelector((state: any) => state.selectedGameRecord.gameMode); 
+        const invitedPlayerId = useSelector((state : any)=> state.selectedGameRecord.invitedPlayerId);
 
-    async function GameBegin(game : any,gamemode : any) {
+    async function GameBegin() {
         try {
+        const res = await axios.post('/api/games/create',{
+        gameType : selectedGame,
+        gameMode : gameMode,
+        invitedUserIds : "", // If no invited player, send empty array
+    },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
 
-            // here i will write the backend logic
-            // i will be sending a post request to submit 
-            // create gameLobby mai body mai ye sabh daalna parega.
-
-            // if correct then only i will be navigate to playGames page.
-            // there also i will have to create a
-            // also there i will give the option to recjoin here.
-            // and iss case main , i dont have to make any waiting room
-            // main direclty hi bana dunga the lobby, also uss wale page mai event listeners bhi lage honge
-            // ussme join and leave game lobby kai event listener hoga
-
-            // navigate (/game: /gamemode: /lobbyId : ) ---> jab bhi re join karega --> uss wakt the backend sai state wapis le aao
-            
-            
-        } catch (error) {
-            
-        }
-        
+    const id = res.data.lobbyId;
+    console.log('Game record created with ID:', id);
+    // on navigation i will have to pass the id of the game record created
+    // and also update the latest gameplay as id
+    // here i wil navigate to the gameplay with id and and also update the latest gameplay as id
+    } 
+    catch (err) {
+        console.error('Failed to create game record:', err);    
     }
+}
+
   return (
     <>
         <button onClick={()=> GameBegin }>Play now !!</button>
     </>
   )
 }
+
 
 export default SinglePlayer
