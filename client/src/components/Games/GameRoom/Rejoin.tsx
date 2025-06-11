@@ -12,6 +12,7 @@ interface GameRoomState {
   allPlayers: string[];
   gameState?: Record<string, number>;
   currentTurn?: number;
+  endedAt?: Date
 }
 
 function Rejoin() {
@@ -43,6 +44,7 @@ function Rejoin() {
           allPlayers,
           gameState: res.data.gameLobby.currentState  || {},
           currentTurn: res.data.gameLobby.currentTurn || 0,
+          endedAt : res.data.gameLobby?.endedAt
         };
         console.log('[Rejoin]Game Data:',  gameData);
 

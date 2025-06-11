@@ -2,6 +2,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import Balance from '../MyBalance/Balance';
 
 export default function MainHome() {
   const username = localStorage.getItem("username"); // Assuming you have a user slice in your Redux store
@@ -12,6 +13,7 @@ export default function MainHome() {
     <div className="flex-1 bg-black text-white flex flex-col justify-center items-center">
       <h1 className="text-4xl font-bold mb-4">Welcome, {username} 👋</h1>
       <h1 className="text-4xl font-bold mb-4">Welcome, {userId} 👋</h1>
+      <Balance/>
       <p className="text-lg mb-6">Ready for your next challenge?</p>
       <button
         onClick={() => navigate('/game')}

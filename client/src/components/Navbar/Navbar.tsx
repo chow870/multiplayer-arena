@@ -60,8 +60,8 @@ function Navbar() {
           <div className="absolute right-0 mt-2 bg-white text-black rounded-lg shadow-lg p-4 w-48 z-50 space-y-2">
             <div onClick={() => navigate('/profile')} className="hover:bg-gray-200 p-2 rounded">👤 My Profile</div>
             <div onClick={() => navigate('/dashboard')} className="hover:bg-gray-200 p-2 rounded">📊 Dashboard</div>
-            <div onClick={() => navigate('/premium')} className="hover:bg-gray-200 p-2 rounded">💎 Buy Premium</div>
-            <div onClick={() => navigate('/wallet')} className="hover:bg-gray-200 p-2 rounded">💰 Top Up</div>
+            <div onClick={() => navigate('/buyPremium')} className="hover:bg-gray-200 p-2 rounded">💎 Buy Premium</div>
+            <div onClick={() => navigate('/topup')} className="hover:bg-gray-200 p-2 rounded">💰 Top Up</div>
             <div onClick={() => navigate('/transactions')} className="hover:bg-gray-200 p-2 rounded">📜 Transactions</div>
             <div onClick={() => navigate('/games')} className="hover:bg-gray-200 p-2 rounded">🎮 Previous Games</div>
             <div onClick={() => {

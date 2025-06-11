@@ -1,4 +1,3 @@
-// GameRoom.tsx
 import React, { useEffect, useState, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import SnakeLadder from '../SnakeandLadder';
@@ -14,8 +13,8 @@ interface GameRoomState {
   allPlayers: string[];
   gameState?: Record<string, number>;
   currentTurn?: number;
+  endedAt?: string;  // ISO timestamp string
 }
-
 interface GameStateUpdatePayload {
   state: Record<string, number>;
   nextTurn: number;
@@ -24,75 +23,52 @@ interface GameStateUpdatePayload {
 interface GameWinnerPayload {
   winnerId: string;
 }
-
-function GameRoom() {
-  // 1) Pull all initial data once:
-  const location = useLocation();
+export default function GameRoom() {
+  const { gameId, gameType, allPlayers, gameState: initialState, currentTurn: initialTurn, endedAt } = useLocation().state.data as GameRoomState;
   const navigate = useNavigate();
-  React.useEffect(() => {
-    if (!location.state?.data) navigate('/game');
-  }, [location.state, navigate]);
-
-  const data = location.state?.data;
-  if (!data) return null;
-
-  const {
-    gameId,
-    gameType,
-    allPlayers,
-    gameState: initialState,
-    currentTurn: initialTurn,
-  } = data;
-
   const dispatch = useDispatch();
-  // const navigate = useNavigate();
   const myId = localStorage.getItem('userId')!;
+  const expireAt = endedAt;
 
-  // 2) Initialize React state from location.data if present:
-  interface PlayerPositions {
-    [playerId: string]: number;
-  }
+  // Core game state
+  const [gameState, setGameState]       = useState<Record<string, number>>(initialState || {});
+  const [currentTurn, setCurrentTurn]   = useState<number>(initialTurn ?? 0);
+  const [playersJoined, setPlayersJoined] = useState<string[]>([]);
+  const [playersReady, setPlayersReady] = useState(false);
+  const [gameOver, setGameOver]         = useState(false);
+  const [winnerId, setWinnerId]         = useState<string|null>(null);
+  
 
-  const [gameState, setGameState] = useState<PlayerPositions>(
-    () =>
-      initialState
-        ? { ...initialState }
-        : allPlayers.reduce((acc: PlayerPositions, pid: string) => {
-            acc[pid] = 1;
-            return acc;
-          }, {} as PlayerPositions)
-  );
-  const [currentTurn, setCurrentTurn] = useState<number>(initialTurn ?? 0);
+  // Expire countdown
+  const [remainingExpire, setRemainingExpire] = useState<number>(0);
+  const expireTimer = useRef<NodeJS.Timeout>();
+  const expireInterval = useRef<NodeJS.Timeout>();
 
-  // 3) Refs to always hold latest values for timers/closures:
+  // Move countdown
+  const [moveCountdown, setMoveCountdown] = useState(5);
+  const moveTimer = useRef<NodeJS.Timeout>();
+  const moveInterval = useRef<NodeJS.Timeout>();
+
+  // Refs for stale closures
   const gameStateRef = useRef(gameState);
   const currentTurnRef = useRef(currentTurn);
-  useEffect(() => {
-    gameStateRef.current = gameState;
-  }, [gameState]);
-  useEffect(() => {
-    currentTurnRef.current = currentTurn;
-  }, [currentTurn]);
+  useEffect(() => { gameStateRef.current = gameState; }, [gameState]);
+  useEffect(() => { currentTurnRef.current = currentTurn; }, [currentTurn]);
 
-  // 4) Other UI state:
-  const [playersReady, setPlayersReady] = useState(false);
-  const [playersJoined, setPlayersJoined] = useState<string[]>([]);
-  const [gameOver, setGameOver] = useState(false);
-  const [winnerId, setWinnerId] = useState<string | null>(null);
-  const [countdown, setCountdown] = useState(5);
-
-  // 5) Timer refs:
-  const moveTimer = useRef<NodeJS.Timeout>();
-  const countdownTimer = useRef<NodeJS.Timeout>();
-
-  // — JOIN / LEAVE ROOM & LOBBY SYNC
+  // JOIN / LOBBY SYNC
   useEffect(() => {
+    if (expireAt && Date.now() >= new Date(expireAt).getTime()) { declareAndExit(); }
     dispatch(clearGameRoom());
     socket.emit('join_game_room', { gameId, userId: myId });
 
     socket.on('updateGameLobby', (joined: string[]) => {
       setPlayersJoined(joined);
       setPlayersReady(joined.length === allPlayers.length);
+
+      // If someone leaves, start lobby expiry countdown
+      if (joined.length < allPlayers.length && expireAt) {
+        startExpireCountdown();
+      }
     });
 
     socket.on('exitGameonGameOver', () => {
@@ -103,54 +79,82 @@ function GameRoom() {
     return () => {
       socket.emit('leave_game_room', { gameId, userId: myId });
       socket.off('updateGameLobby');
-      socket.off('exitGameonGameOver');
+      clearExpireCountdown();
     };
-  }, [gameId, allPlayers.length, myId, navigate, dispatch]);
+  }, [gameId, allPlayers.length]);
 
-  // — GAME STATE SYNC & TIMER START
+  // EXPIRE COUNTDOWN: monitor lobby expiry
+  useEffect(() => {
+    if (expireAt) {
+      const until = new Date(expireAt).getTime() - Date.now();
+      if (until > 0 && playersJoined.length < allPlayers.length) {
+        startExpireCountdown(until / 1000);
+      }
+    }
+    return () => clearExpireCountdown();
+  }, [expireAt, playersJoined]);
+
+  function startExpireCountdown(secondsLeft: number = remainingExpire) {
+    clearExpireCountdown();
+    setRemainingExpire(Math.floor(secondsLeft));
+    expireInterval.current = setInterval(() => {
+      setRemainingExpire(prev => {
+        if (prev <= 1) {
+          clearExpireCountdown();
+          declareAndExit();  // Lobby expires
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  }
+
+  function clearExpireCountdown() {
+    if (expireInterval.current) clearInterval(expireInterval.current);
+  }
+
+  function declareAndExit() {
+    setGameOver(true);
+    // You might call backend to mark lobby expired
+    socket.emit('game_over', { gameId, winnerId: null });
+    dispatch(clearGameRoom());
+    navigate('/game');
+  }
+
+  // GAME SYNC & MOVE timer
   useEffect(() => {
     if (!playersReady) return;
 
-    socket.on('game_state_update', ({ state, nextTurn }: GameStateUpdatePayload) => {
+    socket.on('game_state_update', ({ state, nextTurn }:GameStateUpdatePayload) => {
       setGameState(state);
       setCurrentTurn(nextTurn);
-      startMoveTimer();
+      startMoveCountdown();
     });
 
-    socket.on('gamewinnerannounce', ({ winnerId }: GameWinnerPayload) => {
+    socket.on('game_winner_announce', ({ winnerId }:GameWinnerPayload) => {
       setGameOver(true);
       setWinnerId(winnerId);
-      clearMoveTimer();
+      clearMoveCountdown();
     });
 
     return () => {
-      socket.off('game_state_update');
-      socket.off('gamewinnerannounce');
-      clearMoveTimer();
+      clearMoveCountdown();
     };
   }, [playersReady]);
 
-  // — START / CLEAR TIMERS
-  const startMoveTimer = () => {
-    clearMoveTimer();
-    setCountdown(5);
+  function startMoveCountdown() {
+    clearMoveCountdown();
+    setMoveCountdown(5);
+    moveInterval.current = setInterval(() => setMoveCountdown(c => (c > 1 ? c - 1 : 0)), 1000);
+    moveTimer.current = setTimeout(passTurn, 5000);
+  }
 
-    countdownTimer.current = setInterval(() => {
-      setCountdown(c => {
-        if (c <= 1) clearInterval(countdownTimer.current!);
-        return c - 1;
-      });
-    }, 1000);
+  function clearMoveCountdown() {
+    if (moveTimer.current) clearTimeout(moveTimer.current);
+    if (moveInterval.current) clearInterval(moveInterval.current);
+  }
 
-    moveTimer.current = setTimeout(() => passTurn(), 5000);
-  };
-  const clearMoveTimer = () => {
-    clearTimeout(moveTimer.current);
-    clearInterval(countdownTimer.current);
-  };
-
-  // — PASS TURN (uses refs for fresh state)
-  const passTurn = () => {
+  function passTurn() {
     if (gameOver) return;
     const next = (currentTurnRef.current + 1) % allPlayers.length;
     socket.emit('make_move', {
@@ -159,28 +163,21 @@ function GameRoom() {
       state: gameStateRef.current,
       nextTurn: next,
     });
-  };
+  }
 
-  // — EMIT A REAL MOVE
-  const emitMove = (moveData: any) => {
+  function emitMove(moveData: any) {
     if (gameOver || allPlayers[currentTurn] !== myId) return;
-    clearMoveTimer();
+    clearMoveCountdown();
     const next = (currentTurn + 1) % allPlayers.length;
     const updatedState = {
       ...gameStateRef.current,
       [myId]: (gameStateRef.current[myId] || 1) + moveData.roll,
     };
-
     updateGameMove({ gameId, currentState: updatedState, nextTurn: next });
-    socket.emit('make_move', {
-      gameId,
-      moveData,
-      state: updatedState,
-      nextTurn: next,
-    });
-  };
+    socket.emit('make_move', { gameId, moveData, state: updatedState, nextTurn: next });
+  }
 
-  // — WINNER DETECTION
+  // WIN DETECTION
   useEffect(() => {
     for (const [pid, pos] of Object.entries(gameState)) {
       if (pos >= 100 && !gameOver) {
@@ -188,60 +185,74 @@ function GameRoom() {
         setWinnerId(pid);
         socket.emit('game_winner_announce', { winnerId: pid });
         declareWinner({ gameId, winnerId: pid });
-        clearMoveTimer();
+        clearMoveCountdown();
         break;
       }
     }
   }, [gameState]);
 
-  // — RENDER
+  // --- LAYOUT ---
+
+  // Waiting Screen
   if (!playersReady) {
     return (
-      <div>
-        Waiting for players… {playersJoined.length}/{allPlayers.length}
+      <div className="max-w-md mx-auto text-center mt-20 p-6 bg-white shadow-lg rounded-lg">
+        <h2 className="text-2xl font-bold mb-4">Waiting for players…</h2>
+        <p>{playersJoined.length} / {allPlayers.length} joined.</p>
+        {/* {new Date.now()>=expireAt ? declareAndExit() : } */}
+
+        {expireAt && remainingExpire > 0 && playersJoined.length < allPlayers.length && (
+          <p className="mt-2 text-red-600">Lobby expires in {remainingExpire}s</p>
+        )}
+
         <button
+          className="mt-4 px-6 py-2 bg-red-500 text-white rounded hover:bg-red-600"
           onClick={() => {
-            dispatch(setGameRoom(gameId));
             socket.emit('leave_game_room', { gameId, userId: myId });
+            dispatch(setGameRoom(gameId));
             navigate('/game');
           }}
         >
-          Leave the room
+          Leave Lobby
         </button>
       </div>
     );
   }
 
-  const commonProps = { gameState, currentTurn, emitMove, allPlayers };
-
+  // Main Game View
   return (
-    <div className="space-y-4 p-4">
+    <div className="p-4 space-y-4">
       <button
-        className="px-4 py-2 bg-red-500 text-white rounded"
+        className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
         onClick={() => {
           socket.emit('leave_game_room', { gameId, userId: myId });
           dispatch(setGameRoom(gameId));
           navigate('/game');
         }}
       >
-        Leave the room
+        Leave Game
       </button>
 
       {winnerId && (
         <div className="text-center bg-green-100 text-green-800 font-bold p-2 rounded">
-          🎉 Player {allPlayers.indexOf(winnerId) + 1} Won the Game!
+          🎉 Player {allPlayers.indexOf(winnerId) + 1} Won!
         </div>
       )}
 
       {!gameOver && allPlayers[currentTurn] === myId && (
-        <div className="text-center font-semibold text-blue-700">
-          ⏳ Your turn — auto pass in {countdown}s
+        <div className="text-center text-blue-700 font-semibold">
+          ⏳ Your turn — auto pass in {moveCountdown}s
         </div>
       )}
 
-      {gameType === 'snakes_ladders' && <SnakeLadder {...commonProps} />}
+      {gameType === 'snakes_ladders' && (
+        <SnakeLadder
+          gameState={gameState}
+          currentTurn={currentTurn}
+          emitMove={emitMove}
+          allPlayers={allPlayers}
+        />
+      )}
     </div>
   );
 }
-
-export default GameRoom;

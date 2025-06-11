@@ -4,12 +4,13 @@ import Login from './components/Login/Login';
 import Signup from './components/SignUp/Signup';
 import VerifyEmail from './components/Login/EmailVerification';
 import Homepage from './components/Homepage/Homepage';
-import Game from './components/Games/SnakeandLadder';
 import GamesLandingPage from './components/Games/gamesLandingPage';
 import WaitingRoom from './components/Games/WaitingRoom/WaitingRoom';
-import './App.css';
 import ProtectedLayout from './components/ProtectedLayout/ProtectedLayout';
 import GameRoom from './components/Games/GameRoom/GameRoom';
+import BuyPremium from './components/Transactions/BuyPrenium';
+import Topup from './components/Transactions/Topup';
+import PaymentSuccess from './components/Transactions/SuccessPage';
 
 function App() {
   return (
@@ -26,6 +27,9 @@ function App() {
         <Route path='/game' element={<GamesLandingPage />} />
         <Route path='/game/waitingLobby' element={<WaitingRoom />} />
         <Route path='/game/play' element={<GameRoom />} />
+        <Route path='/buyPremium' element={<BuyPremium/>}/>
+        <Route path='/topup' element={<Topup/>}/>
+        <Route path= '/paymentsuccess' element={<PaymentSuccess/>}/>
 
       </Route>
     </Routes>

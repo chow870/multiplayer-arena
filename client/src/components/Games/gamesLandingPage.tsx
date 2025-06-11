@@ -10,47 +10,52 @@ function GamesLandingPage() {
   const isRejoining = Boolean(gameLobbyId);
 
   return (
-    <div className="flex h-screen p-4 gap-4 bg-gray-100">
-      {/* Left - Game Selection */}
-      <div className="w-2/5 bg-white p-4 rounded-2xl shadow-md overflow-auto">
-        <h2 className="text-xl font-semibold mb-4">Select a Game</h2>
-        <GameSelection />
-      </div>
+    <div className="min-h-screen bg-gray-100 p-6">
+      <div className="max-w-7xl mx-auto grid grid-cols-12 gap-6">
 
-      {/* Middle - Rejoin Button */}
-      {isRejoining && <Rejoin />}
-
-      {/* Middle-right - Players Panels */}
-      <div className="w-1/5 flex flex-col gap-4">
-        <div className="bg-white rounded-2xl p-4 shadow-md h-1/2">
-          <h2 className="text-lg font-semibold">Active Players</h2>
-          <p className="text-sm text-gray-500">Will be added later</p>
+        {/* Left Panel - Game Selection */}
+        <div className="col-span-4 bg-white rounded-2xl shadow-md p-6">
+          <h2 className="text-2xl font-bold mb-4 text-gray-800 flex items-center gap-2">
+            🎮 Select a Game
+          </h2>
+          <GameSelection />
         </div>
-        <div className="bg-white rounded-2xl p-4 shadow-md h-1/2">
-          <h2 className="text-lg font-semibold">Top Players</h2>
-          <p className="text-sm text-gray-500">Will be added later</p>
-        </div>
-      </div>
 
-      {/* Right - Invites */}
-      <div
-        className={`w-2/5 flex flex-col gap-4 transition-opacity duration-300 ${
-          isRejoining ? 'opacity-40 pointer-events-none' : ''
-        }`}
-      >
-        {/* Sent Invites */}
-        <div className="bg-white rounded-2xl p-4 shadow-md flex-1 overflow-auto">
-          <h2 className="text-lg font-semibold mb-2">Invites Sent by Me</h2>
-          <div className="max-h-64 overflow-y-auto pr-2">
-            <SentMyMe />
+        {/* Middle Panel - Rejoin or Invites */}
+        <div className="col-span-4 space-y-6">
+          {isRejoining ? (
+            <div className="bg-white rounded-2xl shadow-md p-6 h-full flex flex-col justify-center items-center">
+              <Rejoin />
+            </div>
+          ) : (
+            <>
+              {/* Sent Invites */}
+              <div className="bg-white rounded-2xl shadow-md p-6 h-64 overflow-y-auto">
+                <h2 className="text-lg font-semibold text-gray-800 mb-3">📤 Invites Sent by Me</h2>
+                <SentMyMe />
+              </div>
+
+              {/* Received Invites */}
+              <div className="bg-white rounded-2xl shadow-md p-6 h-64 overflow-y-auto">
+                <h2 className="text-lg font-semibold text-gray-800 mb-3">📥 Invites Received</h2>
+                <ReceivedInvites />
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Right Panel - Stats */}
+        <div className="col-span-4 space-y-6">
+          {/* Active Players */}
+          <div className="bg-white rounded-2xl shadow-md p-6 h-56">
+            <h2 className="text-lg font-semibold text-gray-800 mb-2">🧑‍🤝‍🧑 Active Players</h2>
+            <p className="text-sm text-gray-500">Will be added later</p>
           </div>
-        </div>
 
-        {/* Received Invites */}
-        <div className="bg-white rounded-2xl p-4 shadow-md flex-1 overflow-auto">
-          <h2 className="text-lg font-semibold mb-2">Invites Received</h2>
-          <div className="max-h-64 overflow-y-auto pr-2">
-            <ReceivedInvites />
+          {/* Top Players */}
+          <div className="bg-white rounded-2xl shadow-md p-6 h-56">
+            <h2 className="text-lg font-semibold text-gray-800 mb-2">🏆 Top Players</h2>
+            <p className="text-sm text-gray-500">Will be added later</p>
           </div>
         </div>
       </div>

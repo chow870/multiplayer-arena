@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { socket } from '../../../socket/socket';
 import { set } from 'zod';
+import { expireWaitingRoom } from './waitingLobbyHelperFunctions';
 
 function WaitingRoom() {
   const location = useLocation();
@@ -85,10 +86,13 @@ function WaitingRoom() {
               allPlayers,
               gameState: res.data.gameLobby.currentState || {},
               currentTurn: res.data.gameLobby.currentTurn || 0,
+              endedAt: res.data.gameLobby?.endedAt
             };
             setDataToTransfer(data);
             console.log(`[frontend] Data to transfer:`, data);
             // handleStartGame();
+            // here i have to make it expire at now so that no one else can join now
+            expireWaitingRoom(lobbyId);
             socket.emit('gameLobbyReady', { data,lobbyId });
             setLoading(false);
 

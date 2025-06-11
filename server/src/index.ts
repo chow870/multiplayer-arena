@@ -14,6 +14,10 @@ import { Server as SocketIOServer } from 'socket.io';
 import{ClientToServerEvents, ServerToClientEvents} from './sockets/types';
 import chatFriendsRouter from './routes/chatsRoutes/chatsRouters';
 import GameRouter from './routes/gamesRoutes/WaitingLobbyRoutes/combinedWLRoutes';
+import { isAmountSufficient } from './middlewares/isAmountSufficient';
+import { getWalletBalance } from './controllers/PayementRelated/fetchBalance';
+import payementRouter from './routes/payementRelated/fetchBalanceRouter';
+import ConfirmpayementRouter from './routes/payementRelated/payementVerificationHandler';
 
 const app:Express = express();
 const httpServer = http.createServer(app);
@@ -30,6 +34,7 @@ app.use('/api/v1/login',LoginRouter);
 app.use('/api/v1/signup',SignupRouter);
 app.use('/api/v1/sendotp',sendOtpRouter);
 app.use('/api/v1/verifyotp',VerifyOtpRouter);
+app.use('/api/v1/pay/paymentverification',ConfirmpayementRouter);
 
 app.use(authenticateToken); // Middleware to authenticate token for all routes below this line
 
@@ -39,7 +44,8 @@ app.use('/api/v1/friendships',DisplayFriendsRouter);
 app.use('/api/v1/friend-request',FriendRequestRouter);
 app.use('/api/v1/chats',chatFriendsRouter );
 app.use('/api/v1/games', GameRouter);
-
+app.use('/api/v1/pay',payementRouter);
+// app.get('/api/v1/balance',isAmountSufficient,);
 
 // socket connections
 const onlineUsers = new Map<string, string>(); // socketId -> userId
@@ -225,6 +231,10 @@ io.on("connection", (socket) => {
     io.in(gameId).emit('gamewinnerannounce', { winnerId });
     io.in(gameId).emit('exitGameonGameOver', {});
   });
+
+  socket.on('game_over',({gameId, winnerId})=>{
+    io.in(gameId).emit('exitGameonGameOver', {});
+  })
 
 
 });

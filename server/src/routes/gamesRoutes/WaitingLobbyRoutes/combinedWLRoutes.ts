@@ -10,6 +10,7 @@ import { createGameRecord } from "../../../controllers/GamesRelatedController/Cr
 import { getGameLobbyDetails } from "../../../controllers/GamesRelatedController/getGameLobbyRecord";
 import { updateWinner } from "../../../controllers/GamesRelatedController/updateWinner";
 import { updateGameState } from "../../../controllers/GamesRelatedController/updateGameState";
+import { expireWaitingRoom } from "../../../controllers/GamesRelatedController/updateWaitingLobbyStatus";
 
 const GameRouter = Router();
 
@@ -21,7 +22,7 @@ GameRouter.delete("/lobby/:lobbyId",deleteLobby );
 GameRouter.get("/invites", getReceivedInvites );
 GameRouter.get("/sent-invites",getSentInvites );
 GameRouter.get("/lobby/:lobbyId/details",getLobbyDetails);
-
+GameRouter.param('/lobby/:lobbyId/expireWaitingRoom', expireWaitingRoom);
 // games
 GameRouter.post('/createGame',createGameRecord);
 GameRouter.get("/Gamelobby/:gameId/details",getGameLobbyDetails);

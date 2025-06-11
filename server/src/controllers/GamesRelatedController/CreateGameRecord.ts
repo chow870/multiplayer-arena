@@ -17,15 +17,17 @@ export const createGameRecord = async (req: Request, res: Response) => {
     }
 
     const newGame = await prisma.gameRecord.create({
-      data: {
-        gameType,
-        invitedUserIds,
-        player: {
-          connect: { id: userId },
-        },
-        currentState: {}, // Empty JSON, will be updated during gameplay
-      },
-    });
+    data: {
+    gameType,
+    invitedUserIds,
+    player: {
+      connect: { id: userId },
+    },
+    currentState: {}, // Empty JSON, will be updated during gameplay
+    endedAt: new Date(Date.now() + 60 * 1000), // 1 hour from now
+  },
+  });
+
 
     return res.status(201).json({ id: newGame.id });
   } catch (error) {
