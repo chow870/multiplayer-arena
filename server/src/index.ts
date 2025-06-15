@@ -145,9 +145,13 @@ io.on("connection", (socket) => {
     if (invitedSocket) {
       // only send if user is online
       io.to(invitedSocket).emit('LobbyInviteReceived', { lobbyId });
-      io.to(socket.id).emit('selfInviteSent', { lobbyId });
+      
     }
   });
+  socket.on('lobbyCreatedSelf',({lobbyId})=>{
+    console.log("[Backend is sending : lobbyCreatedSelf] event");
+    io.to(socket.id).emit('selfInviteSent', { lobbyId });
+  })
 
   // Handle user joining and leaving waiting lobbies
   socket.on('joinWaitingLobby', ({ lobbyId, userId }) => {

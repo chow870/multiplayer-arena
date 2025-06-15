@@ -13,7 +13,7 @@ function SinglePlayer() {
         const res = await axios.post('/api/games/create',{
         gameType : selectedGame,
         gameMode : gameMode,
-        invitedUserIds : "", // If no invited player, send empty array
+        invitedUserIds : [], // If no invited player, send empty array
     },
       {
         headers: {

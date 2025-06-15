@@ -11,7 +11,7 @@ export const createWaitingLobby = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const { invitedUserId, gameMode } = req.body;
+    const { invitedUserIds, gameMode } = req.body;
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
     if(gameMode =="SINGLE" ) {
@@ -27,7 +27,7 @@ export const createWaitingLobby = async (req: Request, res: Response) => {
     return res.status(201).json({ lobbyId: lobby.id });
     }
 
-    if (!invitedUserId || typeof invitedUserId !== 'string') {
+    if (!invitedUserIds || !Array.isArray(invitedUserIds)) {
       return res.status(400).json({ error: 'Invalid invited user ID' });
     }
 
@@ -36,7 +36,7 @@ export const createWaitingLobby = async (req: Request, res: Response) => {
     const lobby = await prisma.waitingLobby.create({
       data: {
         createdById: createdById,
-        invitedUserIds: [invitedUserId], // i will have to change for multiple players
+        invitedUserIds: invitedUserIds, // i will have to change for multiple players
         expiresAt,
         gameLobbyId : req.body.gameLobbyId
       },

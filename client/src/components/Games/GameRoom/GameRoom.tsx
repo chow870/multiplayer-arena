@@ -31,7 +31,11 @@ export default function GameRoom() {
   const expireAt = endedAt;
 
   // Core game state
-  const [gameState, setGameState]       = useState<Record<string, number>>(initialState || {});
+  const [gameState, setGameState]       = useState<Record<string, number>>(
+    initialState && Object.keys(initialState).length !== 0
+      ? initialState
+      : allPlayers.reduce((acc, player) => ({ ...acc, [player]: 0 }), {})
+  );
   const [currentTurn, setCurrentTurn]   = useState<number>(initialTurn ?? 0);
   const [playersJoined, setPlayersJoined] = useState<string[]>([]);
   const [playersReady, setPlayersReady] = useState(false);
@@ -146,7 +150,7 @@ export default function GameRoom() {
     clearMoveCountdown();
     setMoveCountdown(5);
     moveInterval.current = setInterval(() => setMoveCountdown(c => (c > 1 ? c - 1 : 0)), 1000);
-    moveTimer.current = setTimeout(passTurn, 5000);
+    moveTimer.current = setTimeout(passTurn, 60000);
   }
 
   function clearMoveCountdown() {
@@ -157,6 +161,7 @@ export default function GameRoom() {
   function passTurn() {
     if (gameOver) return;
     const next = (currentTurnRef.current + 1) % allPlayers.length;
+    console.log('Passing turn to player:', allPlayers[next]);
     socket.emit('make_move', {
       gameId,
       moveData: null,
@@ -165,16 +170,18 @@ export default function GameRoom() {
     });
   }
 
-  function emitMove(moveData: any) {
+  async function emitMove(moveData: any) {
     if (gameOver || allPlayers[currentTurn] !== myId) return;
     clearMoveCountdown();
-    const next = (currentTurn + 1) % allPlayers.length;
-    const updatedState = {
-      ...gameStateRef.current,
-      [myId]: (gameStateRef.current[myId] || 1) + moveData.roll,
-    };
-    updateGameMove({ gameId, currentState: updatedState, nextTurn: next });
-    socket.emit('make_move', { gameId, moveData, state: updatedState, nextTurn: next });
+    // const next = (currentTurn + 1) % allPlayers.length;
+    // const updatedState = {
+    //   ...gameStateRef.current,
+    //   [myId]: (gameStateRef.current[myId] || 1) + moveData.roll,
+    // };
+    // updateGameMove({ gameId, currentState: updatedState, nextTurn: next });
+
+    console.log('Emitting move:', moveData);
+    socket.emit('make_move', { gameId, moveData :moveData.roll, state: moveData.updatedState, nextTurn: moveData.nextTurn });
   }
 
   // WIN DETECTION
@@ -247,8 +254,9 @@ export default function GameRoom() {
 
       {gameType === 'snakes_ladders' && (
         <SnakeLadder
-          gameState={gameState}
-          currentTurn={currentTurn}
+        gameId={gameId}
+          gameState={gameStateRef.current}
+          currentTurn={currentTurnRef.current}
           emitMove={emitMove}
           allPlayers={allPlayers}
         />

@@ -24,7 +24,7 @@ export const createGameRecord = async (req: Request, res: Response) => {
       connect: { id: userId },
     },
     currentState: {}, // Empty JSON, will be updated during gameplay
-    endedAt: new Date(Date.now() + 60 * 1000), // 1 hour from now
+    endedAt: new Date(Date.now() + 300 * 1000), // 1 hour from now
   },
   });
 

@@ -32,11 +32,17 @@ export const declareWinner = async ({
 export const updateGameMove = async ({
   gameId,
   currentState,
-  nextTurn,
+  currentPalyerId,
+  index, 
+  totalPlayer
+
 }: {
   gameId: string;
   currentState: Record<string, number>;
-  nextTurn: number;
+  currentPalyerId: string;
+  index: number;
+  totalPlayer: number;
+  // nextTurn: number;
 }) => {
   try {
     const token = localStorage.getItem('token');
@@ -45,7 +51,10 @@ export const updateGameMove = async ({
       `/api/v1/games/Gamelobby/${gameId}/updateGameState`,
       {
         currentState,
-        nextTurn,
+        currentPalyerId,
+        index, 
+        totalPlayer
+
       },
       {
         headers: {

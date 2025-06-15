@@ -1,8 +1,11 @@
 // SnakeLadder.tsx
 import React, { useEffect, useState } from 'react';
 import { ladders, snakes } from '../../constant/snakeAndLadder/snakeandladder';
+import axios from 'axios';
+import { updateGameMove } from './GameRoom/updateFunctions';
 
 interface Props {
+  gameId: string,
   gameState: Record<string, number>;
   currentTurn: number;
   emitMove: (moveData: any) => void;
@@ -10,6 +13,7 @@ interface Props {
 }
 
 const SnakeLadder: React.FC<Props> = ({
+  gameId,
   gameState,
   currentTurn,
   emitMove,
@@ -26,12 +30,43 @@ const SnakeLadder: React.FC<Props> = ({
     setMoveMessage(`You moved to ${newPos}`);
   }, [gameState, lastRoll]);
 
-  const rollDice = () => {
+  const rollDice = async (): Promise<any> => {
+    // rather than on the forntend, it should be handled on the backend
     if (allPlayers[currentTurn] !== myId) return;
-    const roll = Math.floor(Math.random() * 6) + 1;
-    setLastRoll(roll);
-    setMoveMessage(`You rolled a ${roll}`);
-    emitMove({ roll });
+    try {
+    const token = localStorage.getItem('token');
+
+    const response = await axios.patch(
+      `/api/v1/games/Gamelobby/${gameId}/updateGameState`,
+      {
+        currentState : gameState,
+        currentPalyerId: myId,
+        index: currentTurn, 
+        totalPlayer: allPlayers.length
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log('Game state updated: [frontend roll dice]', response.data);
+    setLastRoll(response.data.roll);
+    setMoveMessage(`You rolled a ${response.data.roll}`);
+    emitMove({ roll: response.data.roll,newPosition: response.data.newPosition, updatedState: response.data.updatedState, nextTurn: response.data.nextTurn });
+
+    // return response.data;
+  } catch (err) {
+    console.error('Error updating game state:', err);
+    throw err;
+  }
+
+    // updateGameMove({ gameId, currentState: gameState, index: currentTurn, totalPlayer: allPlayers.length,currentPalyerId: myId })
+    
+    // const roll = Math.floor(Math.random() * 6) + 1;
+    // setLastRoll(roll);
+    // setMoveMessage(`You rolled a ${roll}`);
+    // emitMove({ roll });
   };
 
   // Helper to get color per player index
@@ -53,7 +88,7 @@ const SnakeLadder: React.FC<Props> = ({
         const ladderEnd = ladders.get(num);
 
         // Players on this cell
-        const playersHere = allPlayers.filter(pid => gameState[pid] === num);
+        const playersHere = allPlayers?.filter(pid => gameState?.[pid] === num);
         cells.push(
           <div
             key={num}

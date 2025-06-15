@@ -8,7 +8,6 @@ export const getLobbyDetails = async (req: Request, res: Response) => {
   try {
     console.log('Fetching lobby details for lobbyId:', req.params.lobbyId);
     const { lobbyId } = req.params;
-
     const lobby = await prisma.waitingLobby.findUnique({
       where: { id: lobbyId },
       include: {
