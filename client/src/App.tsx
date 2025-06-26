@@ -11,6 +11,8 @@ import GameRoom from './components/Games/GameRoom/GameRoom';
 import BuyPremium from './components/Transactions/BuyPrenium';
 import Topup from './components/Transactions/Topup';
 import PaymentSuccess from './components/Transactions/SuccessPage';
+import TransactionList from './components/AllTransactions/transactions';
+import GameRecordList from './components/prevGames/PrevGames';
 
 function App() {
   return (
@@ -30,6 +32,8 @@ function App() {
         <Route path='/buyPremium' element={<BuyPremium/>}/>
         <Route path='/topup' element={<Topup/>}/>
         <Route path= '/paymentsuccess' element={<PaymentSuccess/>}/>
+        <Route path='/transactions' element={<TransactionList />} />
+        <Route path='/prevGames'element={<GameRecordList/>}/>
 
       </Route>
     </Routes>

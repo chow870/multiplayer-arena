@@ -63,7 +63,7 @@ function Navbar() {
             <div onClick={() => navigate('/buyPremium')} className="hover:bg-gray-200 p-2 rounded">💎 Buy Premium</div>
             <div onClick={() => navigate('/topup')} className="hover:bg-gray-200 p-2 rounded">💰 Top Up</div>
             <div onClick={() => navigate('/transactions')} className="hover:bg-gray-200 p-2 rounded">📜 Transactions</div>
-            <div onClick={() => navigate('/games')} className="hover:bg-gray-200 p-2 rounded">🎮 Previous Games</div>
+            <div onClick={() => navigate('/prevGames')} className="hover:bg-gray-200 p-2 rounded">🎮 Previous Games</div>
             <div onClick={() => {
               localStorage.removeItem("jwtToken");
               navigate('/login');

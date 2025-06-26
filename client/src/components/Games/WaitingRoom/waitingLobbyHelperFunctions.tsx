@@ -1,12 +1,17 @@
 import axios from "axios";
+const token = localStorage.getItem('token');
 
+interface deductAmountType {
+  amount : number,
+  lobbyId:string
+}
 export const expireWaitingRoom = async ({
   lobbyId,
 }: {
   lobbyId: string;
 }) => {
   try {
-    const token = localStorage.getItem('token');
+   
     const response = await axios.patch(
       `/api/v1/games/lobby/${lobbyId}/expireWaitingRoom`,
       {},
@@ -23,4 +28,25 @@ export const expireWaitingRoom = async ({
     throw err;
   }
 };
+
+export async function deductAmount(lobbyId:string) {
+
+  try {
+    const response = await axios.patch(
+      `/api/v1/games/lobby/${lobbyId}/deductAmount`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log('deduct Amount : ',response.data);
+    return response.data;
+  } catch (err) {
+    console.error('Error expiring waiting room:', err);
+    throw err;
+  }
+  
+} 
 

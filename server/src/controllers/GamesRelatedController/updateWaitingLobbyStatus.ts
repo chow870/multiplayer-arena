@@ -5,6 +5,7 @@ import prisma from '../../prisma/client';
 
 export const expireWaitingRoom = async (req: Request, res: Response) => {
   const { lobbyId } = req.params;
+  console.log("reached the expireWaitingRoom ");
 
   try {
     const lobby = await prisma.waitingLobby.findUnique({
@@ -28,7 +29,7 @@ export const expireWaitingRoom = async (req: Request, res: Response) => {
         expiresAt: new Date(), // Set to now
       },
     });
-
+    console.log("updated the waiting lobby status");
     return res.status(200).json({
       message: 'expiresAt updated to now',
       updatedExpiresAt: updatedLobby.expiresAt,

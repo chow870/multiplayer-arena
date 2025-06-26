@@ -6,7 +6,7 @@ import { socket } from '../../../socket/socket';
 
 type Lobby = {
   id: string;
-
+  betAmount ?: number
 };
 
 function ReceivedInvites() {
@@ -72,6 +72,7 @@ function ReceivedInvites() {
           <div key={lobby.id} className="border p-4 rounded shadow-sm flex justify-between items-center">
             <div>
               <p className="font-medium">Lobby ID: {lobby.id}</p>
+              <p className="font-small">Stake : {lobby?.betAmount}||0 </p>
                 <p className="text-sm text-gray-500">You have been invited to join this lobby.</p>
             </div>
             <div className="space-x-2">

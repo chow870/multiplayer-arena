@@ -11,7 +11,7 @@ export const createWaitingLobby = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const { invitedUserIds, gameMode } = req.body;
+    const { invitedUserIds, gameMode,betAmount } = req.body;
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
     if(gameMode =="SINGLE" ) {
@@ -21,6 +21,7 @@ export const createWaitingLobby = async (req: Request, res: Response) => {
         createdById: createdById,
         invitedUserIds: [], // i will have to change for multiple players
         expiresAt,
+        betAmount
       },
     });
 
@@ -38,7 +39,8 @@ export const createWaitingLobby = async (req: Request, res: Response) => {
         createdById: createdById,
         invitedUserIds: invitedUserIds, // i will have to change for multiple players
         expiresAt,
-        gameLobbyId : req.body.gameLobbyId
+        gameLobbyId : req.body.gameLobbyId,
+        betAmount
       },
     });
 

@@ -5,6 +5,7 @@ import { socket } from '../../../socket/socket';
 
 type Lobby = {
   id: string;
+  betAmount ?:number
 };
 
 function SentMyMe() {
@@ -89,6 +90,7 @@ function SentMyMe() {
           >
             <div>
               <p className="font-medium">Lobby ID: {lobby.id}</p>
+              <p className="font-small">Stake : {lobby?.betAmount}||0 </p>
                 <button
                     className="text-blue-500 hover:underline"
                     onClick={() => handleJoinLobby(lobby.id)}

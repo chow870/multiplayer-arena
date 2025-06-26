@@ -18,6 +18,9 @@ import { isAmountSufficient } from './middlewares/isAmountSufficient';
 import { getWalletBalance } from './controllers/PayementRelated/fetchBalance';
 import payementRouter from './routes/payementRelated/fetchBalanceRouter';
 import ConfirmpayementRouter from './routes/payementRelated/payementVerificationHandler';
+import getTransactionsRouter from './routes/payementRelated/fetchTransactions';
+import { getUserGameRecords } from './controllers/GamesRelatedController/getuserGameRecords';
+import getGameRecordsRouter from './routes/getGameRecord.ts/getGameRecord';
 
 const app:Express = express();
 const httpServer = http.createServer(app);
@@ -36,6 +39,7 @@ app.use('/api/v1/sendotp',sendOtpRouter);
 app.use('/api/v1/verifyotp',VerifyOtpRouter);
 app.use('/api/v1/pay/paymentverification',ConfirmpayementRouter);
 
+
 app.use(authenticateToken); // Middleware to authenticate token for all routes below this line
 
 app.use('/api/v1/add-friend',AddFriendRouter);
@@ -45,6 +49,8 @@ app.use('/api/v1/friend-request',FriendRequestRouter);
 app.use('/api/v1/chats',chatFriendsRouter );
 app.use('/api/v1/games', GameRouter);
 app.use('/api/v1/pay',payementRouter);
+app.use('/api/v1/transactions',getTransactionsRouter);
+app.use('/api/v1/gamerecords',getGameRecordsRouter);
 // app.get('/api/v1/balance',isAmountSufficient,);
 
 // socket connections
@@ -172,16 +178,22 @@ io.on("connection", (socket) => {
   });
 
   socket.on('gameLobbyReady',({ data,lobbyId })=>{
-     console.log(`[socket event 'gameLobbyReady'] Lobby ${lobbyId} is ready with data:`, data);
+     
     if (!lobbyMembers.has(lobbyId)) return; // Lobby doesn't exist
     const members = lobbyMembers.get(lobbyId);
     if (members.size === 0) return; // No members in lobby
     // Notify all members in the lobby
+    console.log(`[socket event 'gameLobbyReady'] Lobby ${lobbyId} is ready with data:`, data);
     io.in(lobbyId).emit('startGame', { data });
   });
 
    socket.on('leaveWaitingLobby', ({ lobbyId, userId }) => {
   socket.leave(lobbyId);
+
+  socket.on('deduction_failed',(lobbyId)=>{
+    console.log("from the backend [socket connection] : ", lobbyId);
+    io.in(lobbyId).emit('forced_exit',{});
+  })
 
   if (!lobbyMembers.has(lobbyId)) return; // nothing to remove
 
@@ -197,6 +209,7 @@ io.on("connection", (socket) => {
     }
   }
 });
+
   
   // ————— Game Room Events —————
 

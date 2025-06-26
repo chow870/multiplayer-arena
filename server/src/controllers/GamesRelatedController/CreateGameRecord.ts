@@ -6,7 +6,7 @@ import prisma from '../../prisma/client';
 
 export const createGameRecord = async (req: Request, res: Response) => {
   try {
-    const { gameType, invitedUserIds } = req.body;
+    const { gameType, invitedUserIds,betAmount } = req.body;
     const userId = (req as any).user.id
     if (!userId) {
       return res.status(401).json({ error: 'Unauthorized' });
@@ -23,6 +23,7 @@ export const createGameRecord = async (req: Request, res: Response) => {
     player: {
       connect: { id: userId },
     },
+    betAmount,
     currentState: {}, // Empty JSON, will be updated during gameplay
     endedAt: new Date(Date.now() + 300 * 1000), // 1 hour from now
   },

@@ -4,7 +4,8 @@ import SnakeLadder from '../SnakeandLadder';
 import { socket } from '../../../socket/socket';
 import { useDispatch } from 'react-redux';
 import { clearGameRoom, setGameRoom } from '../../../context/slices/gameLobbyJoined';
-import { declareWinner, updateGameMove } from './updateFunctions';
+import { declareWinner } from './updateFunctions';
+import Confetti from 'react-confetti';
 
 interface GameRoomState {
   gameId: string;
@@ -13,8 +14,10 @@ interface GameRoomState {
   allPlayers: string[];
   gameState?: Record<string, number>;
   currentTurn?: number;
-  endedAt?: string;  // ISO timestamp string
+  endedAt?: string;
+  betAmount: number;
 }
+
 interface GameStateUpdatePayload {
   state: Record<string, number>;
   nextTurn: number;
@@ -23,45 +26,43 @@ interface GameStateUpdatePayload {
 interface GameWinnerPayload {
   winnerId: string;
 }
+
 export default function GameRoom() {
-  const { gameId, gameType, allPlayers, gameState: initialState, currentTurn: initialTurn, endedAt } = useLocation().state.data as GameRoomState;
+  const { gameId, gameType, allPlayers, gameState: initialState, currentTurn: initialTurn, endedAt, betAmount } =
+    useLocation().state.data as GameRoomState;
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const myId = localStorage.getItem('userId')!;
   const expireAt = endedAt;
 
-  // Core game state
-  const [gameState, setGameState]       = useState<Record<string, number>>(
+  const [gameState, setGameState] = useState<Record<string, number>>(
     initialState && Object.keys(initialState).length !== 0
       ? initialState
       : allPlayers.reduce((acc, player) => ({ ...acc, [player]: 0 }), {})
   );
-  const [currentTurn, setCurrentTurn]   = useState<number>(initialTurn ?? 0);
+
+  const [currentTurn, setCurrentTurn] = useState<number>(initialTurn ?? 0);
   const [playersJoined, setPlayersJoined] = useState<string[]>([]);
   const [playersReady, setPlayersReady] = useState(false);
-  const [gameOver, setGameOver]         = useState(false);
-  const [winnerId, setWinnerId]         = useState<string|null>(null);
-  
+  const [gameOver, setGameOver] = useState(false);
 
-  // Expire countdown
+  const [winnerId, setWinnerId] = useState<string | null>(null);
+  const [winnerInfo, setWinnerInfo] = useState<{ username: string; avatarUrl?: string } | null>(null);
+  const [showWinner, setShowWinner] = useState(false);
+
   const [remainingExpire, setRemainingExpire] = useState<number>(0);
-  const expireTimer = useRef<NodeJS.Timeout>();
   const expireInterval = useRef<NodeJS.Timeout>();
-
-  // Move countdown
-  const [moveCountdown, setMoveCountdown] = useState(5);
   const moveTimer = useRef<NodeJS.Timeout>();
   const moveInterval = useRef<NodeJS.Timeout>();
+  const [moveCountdown, setMoveCountdown] = useState(5);
 
-  // Refs for stale closures
   const gameStateRef = useRef(gameState);
   const currentTurnRef = useRef(currentTurn);
   useEffect(() => { gameStateRef.current = gameState; }, [gameState]);
   useEffect(() => { currentTurnRef.current = currentTurn; }, [currentTurn]);
 
-  // JOIN / LOBBY SYNC
   useEffect(() => {
-    if (expireAt && Date.now() >= new Date(expireAt).getTime()) { declareAndExit(); }
+    if (expireAt && Date.now() >= new Date(expireAt).getTime()) declareAndExit();
     dispatch(clearGameRoom());
     socket.emit('join_game_room', { gameId, userId: myId });
 
@@ -69,7 +70,6 @@ export default function GameRoom() {
       setPlayersJoined(joined);
       setPlayersReady(joined.length === allPlayers.length);
 
-      // If someone leaves, start lobby expiry countdown
       if (joined.length < allPlayers.length && expireAt) {
         startExpireCountdown();
       }
@@ -87,7 +87,6 @@ export default function GameRoom() {
     };
   }, [gameId, allPlayers.length]);
 
-  // EXPIRE COUNTDOWN: monitor lobby expiry
   useEffect(() => {
     if (expireAt) {
       const until = new Date(expireAt).getTime() - Date.now();
@@ -105,7 +104,7 @@ export default function GameRoom() {
       setRemainingExpire(prev => {
         if (prev <= 1) {
           clearExpireCountdown();
-          declareAndExit();  // Lobby expires
+          declareAndExit();
           return 0;
         }
         return prev - 1;
@@ -119,23 +118,21 @@ export default function GameRoom() {
 
   function declareAndExit() {
     setGameOver(true);
-    // You might call backend to mark lobby expired
     socket.emit('game_over', { gameId, winnerId: null });
     dispatch(clearGameRoom());
     navigate('/game');
   }
 
-  // GAME SYNC & MOVE timer
   useEffect(() => {
     if (!playersReady) return;
 
-    socket.on('game_state_update', ({ state, nextTurn }:GameStateUpdatePayload) => {
+    socket.on('game_state_update', ({ state, nextTurn }: GameStateUpdatePayload) => {
       setGameState(state);
       setCurrentTurn(nextTurn);
       startMoveCountdown();
     });
 
-    socket.on('game_winner_announce', ({ winnerId }:GameWinnerPayload) => {
+    socket.on('game_winner_announce', ({ winnerId }: GameWinnerPayload) => {
       setGameOver(true);
       setWinnerId(winnerId);
       clearMoveCountdown();
@@ -161,7 +158,6 @@ export default function GameRoom() {
   function passTurn() {
     if (gameOver) return;
     const next = (currentTurnRef.current + 1) % allPlayers.length;
-    console.log('Passing turn to player:', allPlayers[next]);
     socket.emit('make_move', {
       gameId,
       moveData: null,
@@ -173,45 +169,54 @@ export default function GameRoom() {
   async function emitMove(moveData: any) {
     if (gameOver || allPlayers[currentTurn] !== myId) return;
     clearMoveCountdown();
-    // const next = (currentTurn + 1) % allPlayers.length;
-    // const updatedState = {
-    //   ...gameStateRef.current,
-    //   [myId]: (gameStateRef.current[myId] || 1) + moveData.roll,
-    // };
-    // updateGameMove({ gameId, currentState: updatedState, nextTurn: next });
 
-    console.log('Emitting move:', moveData);
-    socket.emit('make_move', { gameId, moveData :moveData.roll, state: moveData.updatedState, nextTurn: moveData.nextTurn });
+    socket.emit('make_move', {
+      gameId,
+      moveData: moveData.roll,
+      state: moveData.updatedState,
+      nextTurn: moveData.nextTurn,
+    });
   }
 
-  // WIN DETECTION
   useEffect(() => {
     for (const [pid, pos] of Object.entries(gameState)) {
       if (pos >= 100 && !gameOver) {
         setGameOver(true);
         setWinnerId(pid);
         socket.emit('game_winner_announce', { winnerId: pid });
-        declareWinner({ gameId, winnerId: pid });
+
+        (async () => {
+          try {
+            const winner = await declareWinner({ gameId, winnerId: pid });
+            setWinnerInfo({ username: winner.username, avatarUrl: winner.avatarUrl });
+            setShowWinner(true);
+            setTimeout(() => {
+              setShowWinner(false);
+              socket.emit('game_over', { gameId, winnerId: null });
+            }, 4000);
+          } catch (err) {
+            console.error("Failed to declare winner:", err);
+            dispatch(clearGameRoom());
+            navigate('/game');
+          }
+        })();
+
         clearMoveCountdown();
         break;
       }
     }
   }, [gameState]);
 
-  // --- LAYOUT ---
+  // --- RENDER ---
 
-  // Waiting Screen
   if (!playersReady) {
     return (
       <div className="max-w-md mx-auto text-center mt-20 p-6 bg-white shadow-lg rounded-lg">
         <h2 className="text-2xl font-bold mb-4">Waiting for players…</h2>
         <p>{playersJoined.length} / {allPlayers.length} joined.</p>
-        {/* {new Date.now()>=expireAt ? declareAndExit() : } */}
-
         {expireAt && remainingExpire > 0 && playersJoined.length < allPlayers.length && (
           <p className="mt-2 text-red-600">Lobby expires in {remainingExpire}s</p>
         )}
-
         <button
           className="mt-4 px-6 py-2 bg-red-500 text-white rounded hover:bg-red-600"
           onClick={() => {
@@ -226,7 +231,6 @@ export default function GameRoom() {
     );
   }
 
-  // Main Game View
   return (
     <div className="p-4 space-y-4">
       <button
@@ -240,10 +244,22 @@ export default function GameRoom() {
         Leave Game
       </button>
 
-      {winnerId && (
-        <div className="text-center bg-green-100 text-green-800 font-bold p-2 rounded">
-          🎉 Player {allPlayers.indexOf(winnerId) + 1} Won!
-        </div>
+      {showWinner && winnerInfo && (
+        <>
+          <Confetti />
+          <div className="text-center text-white font-bold text-2xl p-4 bg-gradient-to-r from-green-400 via-yellow-300 to-pink-400 rounded-lg shadow-lg animate-bounce">
+            🎉 {winnerInfo.username} won the Game! 🎉
+          </div>
+          {winnerInfo.avatarUrl && (
+            <div className="flex justify-center mt-4">
+              <img
+                src={winnerInfo.avatarUrl}
+                alt="Winner Avatar"
+                className="w-20 h-20 rounded-full border-4 border-yellow-300"
+              />
+            </div>
+          )}
+        </>
       )}
 
       {!gameOver && allPlayers[currentTurn] === myId && (
@@ -254,7 +270,7 @@ export default function GameRoom() {
 
       {gameType === 'snakes_ladders' && (
         <SnakeLadder
-        gameId={gameId}
+          gameId={gameId}
           gameState={gameStateRef.current}
           currentTurn={currentTurnRef.current}
           emitMove={emitMove}

@@ -21,6 +21,17 @@ export const joinWaitingLobby = async (req: Request, res: Response) => {
       return res.status(410).json({ error: 'Lobby has expired' });
     }
     
+    // thus checking if he can join or not.
+    let betAmount = lobby.betAmount;
+    const user = await prisma.user.findUnique({
+      where :{id : userId},
+      include :{
+        wallet: true
+      }
+    })
+    if (!user || !user.wallet || typeof user.wallet.balance !== 'number' || user.wallet.balance < betAmount) {
+      return res.status(401).json({ error: 'Insufficient amount in the balance' });
+    }
 
     if (lobby.createdById === userId) {
       return res.status(200).json({ message: 'Successfully joined lobby', lobbyId });

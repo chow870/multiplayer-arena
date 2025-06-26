@@ -25,6 +25,7 @@ enum TransactionType {
   BuyPremium
   Bet
   Topup
+  Win
 }
 
 enum EmailVerificationType {
@@ -131,19 +132,22 @@ model Transaction {
   createdAt  DateTime @default(now())
 }
 
-
 model Bet {
   id          String   @id @default(uuid())
-  players     User[]   // 2 players involved
-
-  amount      Int      // total amount at stake
-  winnerId    String?  // winner's userId (if decided)
-  fee         Int      // platform cut (usually 10%)
-
+  userId      String
+  gameLobbyId String
+  amount      Int
+  winnerId    String?
+  fee         Int?
   createdAt   DateTime @default(now())
   resolvedAt  DateTime?
-}
 
+  // RELATIONS
+  user        User       @relation(fields: [userId], references: [id])
+  gameRecord  GameRecord @relation(fields: [gameLobbyId], references: [id])
+
+  @@unique([userId, gameLobbyId]) // ✅ Ensures each user can only bet once per game
+}
 model Friendship {
   id         String   @id @default(uuid())
 
@@ -182,6 +186,7 @@ model WaitingLobby {
   gameLobbyId     String? 
   // joinedUserIds   String[]      @default([])  // Users who have joined
   createdBy       User          @relation("CreatedLobbies", fields: [createdById], references: [id])
+  betAmount       Int           @default(0)
   
 }
 
@@ -192,7 +197,8 @@ model GameRecord {
   playerId        String      // The player who owns this record
   invitedUserIds  String[]
   // joinedUserIds   String[]    @default([]) // Added for tracking
-
+  betAmount       Int           @default(0)
+  bets            Bet[]
   createdAt       DateTime    @default(now())
   endedAt         DateTime?   // Optional until game ends
   currentState    Json        // Serialized state, type varies by game

@@ -17,6 +17,7 @@ function FriendMode() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const gameType = useSelector((s: any) => s.selectedGameRecord.selectedGameId);
+  const betAmount = useSelector((s :any)=>s.selectedGameRecord.betAmount)
   const myId = localStorage.getItem('userId')!;
 
   // Fetch accepted friends
@@ -64,7 +65,7 @@ function FriendMode() {
       // 1) Create Game Lobby
       const { data: create } = await axios.post(
         '/api/v1/games/createGame',
-        { invitedUserIds: selectedIds, gameType },
+        { invitedUserIds: selectedIds, gameType,betAmount },
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
       const lobbyId = create.id;
@@ -73,7 +74,7 @@ function FriendMode() {
       // 2) Send invites
       let resp = await axios.post(
         '/api/v1/games/invite',
-        { invitedUserIds: selectedIds, gameMode :"FRIEND",gameLobbyId: lobbyId },
+        { invitedUserIds: selectedIds, gameMode :"FRIEND",gameLobbyId: lobbyId,betAmount },
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
 
