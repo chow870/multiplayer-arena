@@ -28,7 +28,7 @@ export const loginController = async (req: Request, res: Response) => {
     const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET!)
 
     // Return token (you’ll store it in localStorage on frontend)
-    res.status(200).json({ token, user: { id: user.id, username: user.username, email: user.email } })
+    res.status(200).json({ token, user: { id: user.id, username: user.username,avatarUrl:user.avatarUrl } })
   } catch (error) {
     console.error("Login error:", error)
     res.status(500).json({ message: "Internal server error" })

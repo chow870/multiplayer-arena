@@ -1,40 +1,33 @@
 import { Request, Response } from "express";
-// import cloudinary from "../utils/cloudinary";
-import multer from "multer";
 import cloudinary from "../../utils/cloudinary";
-import prisma from "../../prisma/client";
-// import prisma from "../prisma/client";
+import multer from "multer";
+import fs from "fs";
 
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
+// Multer config
+const storage = multer.diskStorage({
+  destination: "uploads/",
+  filename: (_, file, cb) => cb(null, Date.now() + "-" + file.originalname),
+});
 
-export const uploadAvatarMiddleware = upload.single("avatar");
+export const upload = multer({ storage });
 
 export const uploadAvatar = async (req: Request, res: Response) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
-    }
+    const file = req.file;
+    if (!file) return res.status(400).json({ message: "No file uploaded" });
 
-    const b64 = Buffer.from(req.file.buffer).toString("base64");
-    const dataURI = `data:${req.file.mimetype};base64,${b64}`;
-
-    const result = await cloudinary.uploader.upload(dataURI, {
+    const result = await cloudinary.uploader.upload(file.path, {
       folder: "avatars",
-      transformation: [{ width: 256, height: 256, crop: "thumb", gravity: "face" }],
+      width: 300,
+      height: 300,
+      crop: "fill", // Optional server-side crop
     });
 
-    const updatedUser = await prisma.user.update({
-      where: { id: (req as any).user.id },  // assumes authenticateToken middleware adds req.user
-      data: { avatarUrl: result.secure_url },
-    });
+    // Clean up local temp file
+    fs.unlinkSync(file.path);
 
-    return res.status(200).json({
-      message: "Avatar uploaded and user updated successfully",
-      avatarUrl: updatedUser.avatarUrl,
-    });
+    return res.status(200).json({ imageUrl: result.secure_url });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: "Upload failed" });
+    return res.status(500).json({ message: "Upload failed", error: err });
   }
 };

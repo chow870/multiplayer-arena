@@ -57,6 +57,7 @@ model User {
   emailVerified   Boolean         @default(false)
   passwordHash    String
   avatarUrl       String?
+  bio             String?        @default("")
 
   // Premium Features
   isPremium       Boolean         @default(false)

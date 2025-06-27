@@ -13,6 +13,7 @@ import Topup from './components/Transactions/Topup';
 import PaymentSuccess from './components/Transactions/SuccessPage';
 import TransactionList from './components/AllTransactions/transactions';
 import GameRecordList from './components/prevGames/PrevGames';
+import UserProfile from './components/profilePage/ProfilePage';
 
 function App() {
   return (
@@ -33,7 +34,8 @@ function App() {
         <Route path='/topup' element={<Topup/>}/>
         <Route path= '/paymentsuccess' element={<PaymentSuccess/>}/>
         <Route path='/transactions' element={<TransactionList />} />
-        <Route path='/prevGames'element={<GameRecordList/>}/>
+        <Route path='/prevGames' element={<GameRecordList/>}/>
+        <Route path='/profile' element={<UserProfile/>}/>
 
       </Route>
     </Routes>

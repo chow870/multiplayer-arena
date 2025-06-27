@@ -1,7 +1,7 @@
 
 import { setUser } from '../../context/slices/userSlice';
 import axios from 'axios';
-import React, { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 

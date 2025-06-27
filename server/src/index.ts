@@ -21,6 +21,7 @@ import ConfirmpayementRouter from './routes/payementRelated/payementVerification
 import getTransactionsRouter from './routes/payementRelated/fetchTransactions';
 import { getUserGameRecords } from './controllers/GamesRelatedController/getuserGameRecords';
 import getGameRecordsRouter from './routes/getGameRecord.ts/getGameRecord';
+import ProfileRouter from './routes/ProfileRelated/ProfileRouter';
 
 const app:Express = express();
 const httpServer = http.createServer(app);
@@ -51,6 +52,7 @@ app.use('/api/v1/games', GameRouter);
 app.use('/api/v1/pay',payementRouter);
 app.use('/api/v1/transactions',getTransactionsRouter);
 app.use('/api/v1/gamerecords',getGameRecordsRouter);
+app.use('/api/v1/user',ProfileRouter)
 // app.get('/api/v1/balance',isAmountSufficient,);
 
 // socket connections
