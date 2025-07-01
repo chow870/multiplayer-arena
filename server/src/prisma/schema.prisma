@@ -94,6 +94,8 @@ model User {
   createdLobbies   WaitingLobby[] @relation("CreatedLobbies")
   wonGames         GameRecord[]   @relation("WonGames")
   gameRecords      GameRecord[]   @relation("UserGameRecords")
+  blogs            Blog[]         @relation("UserBlogs")
+  comments         Comment[]      @relation("UserComments")
 }
 
 model Message {
@@ -208,5 +210,29 @@ model GameRecord {
   winner          User?       @relation("WonGames", fields: [winnerId], references: [id])
   player          User        @relation("UserGameRecords", fields: [playerId], references: [id])
 }
+
+model Blog {
+  id         String     @id @default(cuid())
+  authorId   String
+  author     User       @relation("UserBlogs", fields: [authorId], references: [id])
+  title      String
+  content    Json       // Tiptap JSON
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  likes      Int        @default(0)
+  dislikes   Int        @default(0)
+  comments   Comment[]  @relation("BlogComments")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  blogId    String
+  authorId  String
+  content   Json     // Tiptap JSON, or simple text
+  createdAt DateTime @default(now())
+  author    User     @relation("UserComments", fields: [authorId], references: [id])
+  blog      Blog     @relation("BlogComments", fields: [blogId], references: [id])
+}
+
 
 

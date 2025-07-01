@@ -35,6 +35,8 @@ export const getUserFriendships = async (req: Request, res: Response) => {
           senderid: f.sender.id,
           sendername: f.sender.username,
           receiverid: f.receiver.id,
+          avatarUrlSender:f.sender.avatarUrl,
+          avatarUrlReceiver : f.receiver.avatarUrl,
           receivername: f.receiver.username,
           status: f.status
         };
@@ -45,6 +47,8 @@ export const getUserFriendships = async (req: Request, res: Response) => {
           senderid: f.sender.id,
           sendername: f.sender.username,
           receiverid: f.receiver.id,
+          avatarUrlSender:f.sender.avatarUrl,
+          avatarUrlReceiver : f.receiver.avatarUrl,
           receivername: f.receiver.username,
           status: f.status
         };
@@ -55,6 +59,8 @@ export const getUserFriendships = async (req: Request, res: Response) => {
           senderid: f.sender.id,
           sendername: f.sender.username,
           receiverid: f.receiver.id,
+          avatarUrlSender:f.sender.avatarUrl,
+          avatarUrlReceiver : f.receiver.avatarUrl,
           receivername: f.receiver.username,
           status: f.status
         };

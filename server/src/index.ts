@@ -11,17 +11,15 @@ import FriendRequestRouter from './routes/FriendRequest/acceptFriendRequest';
 import { authenticateToken } from './middlewares/authMiddleware';
 import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
-import{ClientToServerEvents, ServerToClientEvents} from './sockets/types';
 import chatFriendsRouter from './routes/chatsRoutes/chatsRouters';
 import GameRouter from './routes/gamesRoutes/WaitingLobbyRoutes/combinedWLRoutes';
 import { isAmountSufficient } from './middlewares/isAmountSufficient';
-import { getWalletBalance } from './controllers/PayementRelated/fetchBalance';
 import payementRouter from './routes/payementRelated/fetchBalanceRouter';
 import ConfirmpayementRouter from './routes/payementRelated/payementVerificationHandler';
 import getTransactionsRouter from './routes/payementRelated/fetchTransactions';
-import { getUserGameRecords } from './controllers/GamesRelatedController/getuserGameRecords';
 import getGameRecordsRouter from './routes/getGameRecord.ts/getGameRecord';
 import ProfileRouter from './routes/ProfileRelated/ProfileRouter';
+import Blogrouter from './routes/BlogRouter/blogCommentRouter';
 
 const app:Express = express();
 const httpServer = http.createServer(app);
@@ -52,7 +50,8 @@ app.use('/api/v1/games', GameRouter);
 app.use('/api/v1/pay',payementRouter);
 app.use('/api/v1/transactions',getTransactionsRouter);
 app.use('/api/v1/gamerecords',getGameRecordsRouter);
-app.use('/api/v1/user',ProfileRouter)
+app.use('/api/v1/user',ProfileRouter);
+app.use('/api/v1/blog',Blogrouter);
 // app.get('/api/v1/balance',isAmountSufficient,);
 
 // socket connections

@@ -25,15 +25,17 @@ function FriendMode() {
     (async () => {
       try {
         setIsLoading(true);
-        const { data } = await axios.get('/api/v1/friendships', {
+        const  resp  = await axios.get('/api/v1/friendships', {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
         });
         // Transform to user objects, excluding yourself
+        console.log("the friends that i have frinds as : ", resp)
+        let data = resp.data;
         const list: FriendObj[] = [];
         data.acceptedFriends.forEach((f: any) => {
           const candidates = [
-            { id: f.senderid, username: f.sendername, avatarUrl: f.senderAvatar },
-            { id: f.receiverid, username: f.receivername, avatarUrl: f.receiverAvatar }
+            { id: f.senderid, username: f.sendername, avatarUrl: f.avatarUrlSender },
+            { id: f.receiverid, username: f.receivername, avatarUrl: f.avatarUrlReceiver }
           ];
           for (const c of candidates) {
             if (c.id !== myId && !list.find(u => u.id === c.id)) {
@@ -41,6 +43,7 @@ function FriendMode() {
             }
           }
         });
+        console.log("on the friend Mode : ", list);
         setFriends(list);
       } catch (e) {
         console.error('Error fetching friends:', e);
