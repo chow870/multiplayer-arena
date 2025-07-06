@@ -1,27 +1,26 @@
 import axios from "axios";
 
-export const declareWinner = async ({
+// wiil move this to the backend.
+// yaha security break ho sakta tha. 
+export const getWinner = async ({
   gameId,
-  winnerId,
+  // winnerId,
 }: {
   gameId: string;
-  winnerId: string;
+  // winnerId: string;
 }) => {
   try {
     const token = localStorage.getItem('token');
 
-    const response = await axios.patch(
-      `/api/v1/games/Gamelobby/${gameId}/updateWinner`,
-      {
-        winnerId,
-      },
+    const response = await axios.get(
+      `/api/v1/games/Gamelobby/${gameId}/getWinner`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       }
     );
-
+    console.log("the winner data is  :", response.data)
     return response.data;
   } catch (err) {
     console.error('Error updating winner:', err);

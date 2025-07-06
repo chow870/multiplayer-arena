@@ -8,7 +8,7 @@ import { joinWaitingLobby } from "../../../controllers/GamesRelatedController/Jo
 import { createWaitingLobby } from "../../../controllers/GamesRelatedController/CreateWaitingLobby";
 import { createGameRecord } from "../../../controllers/GamesRelatedController/CreateGameRecord";
 import { getGameLobbyDetails } from "../../../controllers/GamesRelatedController/getGameLobbyRecord";
-import { updateWinner } from "../../../controllers/GamesRelatedController/updateWinner";
+import { getWinner } from "../../../controllers/GamesRelatedController/updateWinner";
 import { updateGameState } from "../../../controllers/GamesRelatedController/updateGameState";
 import { expireWaitingRoom } from "../../../controllers/GamesRelatedController/updateWaitingLobbyStatus";
 import { joinGameRoom } from "../../../controllers/GamesRelatedController/JoinGameRoom";
@@ -27,8 +27,8 @@ GameRouter.patch('/lobby/:lobbyId/expireWaitingRoom', expireWaitingRoom);
 // games
 GameRouter.post('/createGame',createGameRecord);
 GameRouter.get("/Gamelobby/:gameId/details",getGameLobbyDetails);
-GameRouter.patch('/Gamelobby/:gameId/updateWinner',updateWinner);
-GameRouter.patch('/Gamelobby/:gameId/updateGameState',updateGameState);
+GameRouter.get('/Gamelobby/:gameId/getWinner',getWinner);// this also done internally 
+GameRouter.patch('/Gamelobby/:gameId/updateGameState',updateGameState); // this will be now be done internally. 
 GameRouter.patch('/lobby/:lobbyId/deductAmount',joinGameRoom)
 
 

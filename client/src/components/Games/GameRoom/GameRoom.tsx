@@ -4,7 +4,7 @@ import SnakeLadder from '../SnakeandLadder';
 import { socket } from '../../../socket/socket';
 import { useDispatch } from 'react-redux';
 import { clearGameRoom, setGameRoom } from '../../../context/slices/gameLobbyJoined';
-import { declareWinner } from './updateFunctions';
+import { getWinner } from './updateFunctions';
 import Confetti from 'react-confetti';
 
 interface GameRoomState {
@@ -187,14 +187,16 @@ export default function GameRoom() {
 
         (async () => {
           try {
-            const winner = await declareWinner({ gameId, winnerId: pid });
-            setWinnerInfo({ username: winner.username, avatarUrl: winner.avatarUrl });
+            const winner = await getWinner({ gameId});
+            console.log("the winner from the frontend gameRoom component is : ",winner);
+            // setWinnerInfo({ username: winner.username, avatarUrl: winner.avatarUrl });
             setShowWinner(true);
             setTimeout(() => {
               setShowWinner(false);
               socket.emit('game_over', { gameId, winnerId: null });
             }, 4000);
-          } catch (err) {
+          } 
+          catch (err) {
             console.error("Failed to declare winner:", err);
             dispatch(clearGameRoom());
             navigate('/game');

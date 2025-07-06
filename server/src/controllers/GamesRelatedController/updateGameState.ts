@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import prisma from '../../prisma/client';
+import redis from '../../workers/redisClient';
 // import { prisma } from '../../lib/prisma';
 
 export const updateGameState = async (req: Request, res: Response) => {
@@ -23,10 +24,15 @@ export const updateGameState = async (req: Request, res: Response) => {
 
     // Calculate new position (max 100)
     let newPos = currentPos + roll;
-    if (newPos > 100) {
-      newPos = 100; // Do not move if it overshoots
+    if (newPos >= 100) {
+      newPos = 100; 
+      // implies this is the new winner 
+      // later i would give this to the workers 
+      redis.lpush("update_the_game",JSON.stringify({
+        gameId
+      }))
+      // 
     }
-
     // Update the position
     newState[currentPalyerId] = newPos;
 
