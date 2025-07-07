@@ -84,7 +84,7 @@ function Navbar() {
             <div onClick={() => navigate('/transactions')} className="hover:bg-gray-200 p-2 rounded">📜 Transactions</div>
             <div onClick={() => navigate('/prevGames')} className="hover:bg-gray-200 p-2 rounded">🎮 Previous Games</div>
             <div onClick={() => {
-              localStorage.removeItem("Token");
+              localStorage.removeItem("token");
               navigate('/login');
             }} className="hover:bg-red-100 text-red-600 p-2 rounded">🚪 Logout</div>
           </div>

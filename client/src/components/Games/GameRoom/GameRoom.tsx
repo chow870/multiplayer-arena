@@ -54,6 +54,9 @@ export default function GameRoom() {
   const expireInterval = useRef<NodeJS.Timeout>();
   const moveTimer = useRef<NodeJS.Timeout>();
   const moveInterval = useRef<NodeJS.Timeout>();
+  const reconnectTimeout = useRef<NodeJS.Timeout>();
+
+
   const [moveCountdown, setMoveCountdown] = useState(5);
 
   const gameStateRef = useRef(gameState);
@@ -66,6 +69,28 @@ export default function GameRoom() {
     dispatch(clearGameRoom());
     socket.emit('join_game_room', { gameId, userId: myId });
 
+    // server issue 
+    socket.on('disconnect', () => {
+      console.warn('Socket disconnected, waiting 10s to reconnect…');
+      reconnectTimeout.current = setTimeout(() => {
+        alert(
+          'Server issue detected. Your game will be cancelled and a refund will be initiated soon.'
+        );
+        // clean up and refund
+        dispatch(clearGameRoom());
+        navigate('/game');
+      }, 10000);
+    });
+
+    // If we reconnect in time, cancel the refund
+    socket.on('connect', () => {
+      console.log('Socket reconnected, clearing refund timer');
+      if (reconnectTimeout.current) {
+        clearTimeout(reconnectTimeout.current);
+      }
+    });
+
+
     socket.on('updateGameLobby', (joined: string[]) => {
       setPlayersJoined(joined);
       setPlayersReady(joined.length === allPlayers.length);
@@ -77,12 +102,25 @@ export default function GameRoom() {
 
     socket.on('exitGameonGameOver', () => {
       dispatch(clearGameRoom());
+      // localStorage.removeItem("token");
       navigate('/game');
+    });
+    socket.on('exitGameonGameOverForced', () => {
+      dispatch(clearGameRoom());
+      localStorage.removeItem("token");
+      navigate('/login');
     });
 
     return () => {
+
       socket.emit('leave_game_room', { gameId, userId: myId });
       socket.off('updateGameLobby');
+      socket.off('disconnect');
+      socket.off('connect');
+      socket.off("exitGameonGameOver");
+      socket.off("exitGameonGameOverForced");
+
+      if (reconnectTimeout.current) clearTimeout(reconnectTimeout.current);
       clearExpireCountdown();
     };
   }, [gameId, allPlayers.length]);
@@ -127,6 +165,7 @@ export default function GameRoom() {
     if (!playersReady) return;
 
     socket.on('game_state_update', ({ state, nextTurn }: GameStateUpdatePayload) => {
+      console.log("[fronted for debugging] response of emitmove event ")
       setGameState(state);
       setCurrentTurn(nextTurn);
       startMoveCountdown();
@@ -169,7 +208,7 @@ export default function GameRoom() {
   async function emitMove(moveData: any) {
     if (gameOver || allPlayers[currentTurn] !== myId) return;
     clearMoveCountdown();
-
+    // again and again this will be sending the socket connection.
     socket.emit('make_move', {
       gameId,
       moveData: moveData.roll,

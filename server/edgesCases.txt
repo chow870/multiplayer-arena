@@ -1,0 +1,11 @@
+1. once the game begins: 
+    there are a few cases, like the server may crash, thus socket connections will also not happen.
+    we will have to handle it by exiting the game, forced_exit.
+    : so used the socket connections on the client side.
+
+2: redis queue for the refund and reward generation
+    - if not working then game continues till redis reconnects
+    - else at the pushing time, does not reconnect then error 500 is thrown as forced_exit is initatied
+    -nodecorn will pickup that up and put in the redis queue or report to the admin
+    - refund or the reward will be initatied accorginly.
+3. these were the main edges cases that i have tried to handle it.

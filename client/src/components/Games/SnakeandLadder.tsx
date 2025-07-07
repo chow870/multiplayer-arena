@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { ladders, snakes } from '../../constant/snakeAndLadder/snakeandladder';
 import axios from 'axios';
 import { updateGameMove } from './GameRoom/updateFunctions';
+import { socket } from '../../socket/socket';
 
 interface Props {
   gameId: string,
@@ -53,12 +54,20 @@ const SnakeLadder: React.FC<Props> = ({
     console.log('Game state updated: [frontend roll dice]', response.data);
     setLastRoll(response.data.roll);
     setMoveMessage(`You rolled a ${response.data.roll}`);
+
+    // here is the socket connection 
     emitMove({ roll: response.data.roll,newPosition: response.data.newPosition, updatedState: response.data.updatedState, nextTurn: response.data.nextTurn });
 
     // return response.data;
   } catch (err) {
     console.error('Error updating game state:', err);
-    throw err; // means there was some error in the backend , we will have to handle it 
+    alert("forced exit is here");
+    socket.emit("exitGameonGameOverForced",{});
+    // throw err; // means there was some error in the backend , we will have to handle it 
+    // implies that 500 means on thing, either the db issue or the server, in this case i will have to exit the game
+    // but if the server is down i wont be able to send any socket response actually.
+    // nor any http request will do anything in that case.
+    // 
   }
 
     // updateGameMove({ gameId, currentState: gameState, index: currentTurn, totalPlayer: allPlayers.length,currentPalyerId: myId })

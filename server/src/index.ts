@@ -240,7 +240,7 @@ io.on("connection", (socket) => {
   socket.on('make_move', ({ gameId, moveData, state, nextTurn }) => {
     // 1) Here you could validate moveData server-side and update your DB...
     // 2) Then broadcast new state & turn to all clients in room:
-    console.log(`[socket event 'make_move'] Game ${gameId} move by ${socket.data.userId}:`, state);
+    console.log(`[socket event 'make_move'] Game ${gameId} move by ${socket.data.userId}:`, state); 
     io.in(gameId).emit('game_state_update', { state, nextTurn });
   });
 
@@ -249,7 +249,7 @@ io.on("connection", (socket) => {
     io.in(gameId).emit('gamewinnerannounce', { winnerId });
     io.in(gameId).emit('exitGameonGameOver', {});
   });
-
+  
   socket.on('game_over',({gameId, winnerId})=>{
     io.in(gameId).emit('exitGameonGameOver', {});
   })
@@ -257,6 +257,17 @@ io.on("connection", (socket) => {
 
 });
 
+// 📁 backend/src/index.ts (your entry point)
+
+process.on("uncaughtException", (err) => {
+  console.error("🔥 Uncaught Exception:", err);
+  process.exit(1); // Optional: exit or restart logic
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("🚨 Unhandled Rejection:", reason);
+  process.exit(1); // Optional
+});
 
 httpServer.listen(3000, ()=>{
     console.log("The backend is running at the port 3000")

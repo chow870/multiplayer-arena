@@ -50,7 +50,7 @@ function WaitingRoom() {
     });
 
     socket.on('forced_exit', () => {
-      alert('⛔ Insufficient balance detected. Please ensure all players meet the stake requirement.');
+      alert('⛔Insufficient balance detected. Please ensure all players meet the stake requirement.');
       navigate('/game');
     });
 
@@ -62,7 +62,7 @@ function WaitingRoom() {
     };
   }, [lobbyId]);
 
-  // 🧠 React to all players joining
+  // 🧠 React to all players joining : 
   useEffect(() => {
     if (!lobbyDetails || joinedUserIds.length === 0) return;
 

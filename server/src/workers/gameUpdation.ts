@@ -102,16 +102,15 @@ async function processSubmission(submission:string) {
             }
         }));
 
-
     } 
     catch (err) {
         // faulty
-        await redis.lpush("faulty_admin_task", JSON.stringify({
+        await redis.lpush("update_the_game", JSON.stringify({
             gameId,
             type:"gamesRelated"
         }))
 
-        console.error("Worker error:", err);
+        // console.error("Worker error:", err);
     }
 
 }

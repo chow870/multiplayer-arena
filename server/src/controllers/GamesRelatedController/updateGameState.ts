@@ -30,14 +30,13 @@ export const updateGameState = async (req: Request, res: Response) => {
       newPos = 30; 
       // implies this is the new winner 
       // later i would give this to the workers 
-      // here only update the winner also
+      // here only update the winner also.
       await prisma.gameRecord.update({
         where: {id: gameId},
         data:{
           winnerId : userId,
         },
       })
-
       console.log("internally updated the winner also.")
       redis.lpush("update_the_game",JSON.stringify({
         element :{
