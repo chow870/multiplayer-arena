@@ -180,7 +180,7 @@ export default function GameRoom() {
 
   useEffect(() => {
     for (const [pid, pos] of Object.entries(gameState)) {
-      if (pos >= 100 && !gameOver) {
+      if (pos >= 30 && !gameOver) { // just for testing purposes only.
         setGameOver(true);
         setWinnerId(pid);
         socket.emit('game_winner_announce', { winnerId: pid });

@@ -58,7 +58,7 @@ const SnakeLadder: React.FC<Props> = ({
     // return response.data;
   } catch (err) {
     console.error('Error updating game state:', err);
-    throw err;
+    throw err; // means there was some error in the backend , we will have to handle it 
   }
 
     // updateGameMove({ gameId, currentState: gameState, index: currentTurn, totalPlayer: allPlayers.length,currentPalyerId: myId })

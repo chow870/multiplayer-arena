@@ -15,10 +15,10 @@ export const createGameRecord = async (req: Request, res: Response) => {
     if (!gameType || !Array.isArray(invitedUserIds)) {
       return res.status(400).json({ error: 'Invalid data format' });
     }
-
     const newGame = await prisma.gameRecord.create({
     data: {
     gameType,
+    createdBy:userId,
     invitedUserIds,
     player: {
       connect: { id: userId },

@@ -65,7 +65,7 @@ function FriendMode() {
     if (selectedIds.length === 0) return;
 
     try {
-      // 1) Create Game Lobby
+      // 1) Create Game Lobby : 
       const { data: create } = await axios.post(
         '/api/v1/games/createGame',
         { invitedUserIds: selectedIds, gameType,betAmount },

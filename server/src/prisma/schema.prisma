@@ -200,6 +200,7 @@ model GameRecord {
   playerId        String      // The player who owns this record
   invitedUserIds  String[]
   // joinedUserIds   String[]    @default([]) // Added for tracking
+  createdBy       String?
   betAmount       Int           @default(0)
   bets            Bet[]
   createdAt       DateTime    @default(now())

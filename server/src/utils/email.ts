@@ -1,18 +1,18 @@
 // server/src/utils/email.ts
-import nodemailer, { Transporter } from "nodemailer";
 import dotenv from "dotenv";
-
 dotenv.config();
+import nodemailer, { Transporter } from "nodemailer";
+// email.ts
 
-if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-  throw new Error("SMTP credentials are missing");
-}
+// if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+//   throw new Error("SMTP credentials are missing");
+// }
 
 export const transporter: Transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
+    user: "adi228.ch@gmail.com",
+    pass: "lkju jqba sjdo nzda",
   },
 });
 

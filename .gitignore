@@ -8,7 +8,7 @@ prisma/migrations/
 
 # Build output
 dist/
-
+*./src/utils/email.ts
 # Env files
 .env
 

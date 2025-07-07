@@ -9,7 +9,8 @@ import prisma from "../prisma/client";
 import redis from "./redisClient";
 
 async function processSubmission(submission:string) {
-    const { gameId } = JSON.parse(submission).element;
+    const { gameId } = JSON.parse(submission).element; 
+    console.log("gameId", gameId);
     try {
         console.log(`Processing gameId ${gameId}`);
         // first fetch all the users and winner
@@ -23,10 +24,17 @@ async function processSubmission(submission:string) {
             }
         });
 
-        const invited = rec?.invitedUserIds; // this array
+        const invited :string[] | undefined = rec?.invitedUserIds; // this array
+        // now 
+        if(rec?.createdBy){
+             invited?.push(rec?.createdBy);
+        }
+        console.log("invited is: ", invited);
         const winner = rec?.winnerId;
+        console.log("the winner id is: ", winner);
         const amountRefund = rec?.betAmount || 0;
         const winningAmount = Number(amountRefund || 0) * (invited?.length || 1);
+        console.log("winning amount is :", winningAmount);
 
         if (winner == null) { // means i have to generate the refund
             if (invited) {
@@ -43,12 +51,14 @@ async function processSubmission(submission:string) {
                     )
                 );
             }
-        } else {
+        } 
+        else {
             if (invited) {
                 await Promise.all(
                     invited
                         .filter((userId) => userId != winner)
                         .map((userId) =>
+                            // console.log("the user id is : ", userId)
                             prisma.user.update({
                                 where: {
                                     id: userId,
@@ -83,14 +93,18 @@ async function processSubmission(submission:string) {
                 }
             })
         }
+
         // this completes the process actually.
         // this is pushing to the queue
         await redis.lpush("notify_email_service", JSON.stringify({
-            gameId,
+            element:{
+                gameId,
+            }
         }));
 
 
-    } catch (err) {
+    } 
+    catch (err) {
         // faulty
         await redis.lpush("faulty_admin_task", JSON.stringify({
             gameId,
@@ -99,19 +113,21 @@ async function processSubmission(submission:string) {
 
         console.error("Worker error:", err);
     }
+
 }
 
 async function start() {
     console.log("Worker started and connected to Redis from the gameUpdation worker");
     while (true) {
         const job = await redis.brpop("update_the_game", 0); 
+        console.log("the job received is : ",job);
         if (!job || !job[1]) {
             console.warn("Received null or invalid job from Redis.");
             continue;
         }
         // here i want the gameid; then i can fetch everything from it. 
-        // const temp = JSON.parse(job[1]);
-        // console.log(temp);
+        const temp = JSON.parse(job[1]);
+        console.log(temp);
         // @ts-ignore
 
         await processSubmission(job[1]);
