@@ -1,6 +1,6 @@
+import '../../env'
 import { Request, Response } from "express";
 import Razorpay from "razorpay";
-
 import crypto from "crypto";
 import prisma from "../../prisma/client";
 enum TransactionType {
