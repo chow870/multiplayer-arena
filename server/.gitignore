@@ -30,5 +30,8 @@ dist-ssr
 
 #Backend
 ./server
+*dist
+./server/dist
+
 
 

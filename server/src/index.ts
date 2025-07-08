@@ -269,6 +269,7 @@ process.on("unhandledRejection", (reason, promise) => {
   process.exit(1); // Optional
 });
 
-httpServer.listen(3000, ()=>{
+const PORT = process.env.PORT
+httpServer.listen(PORT||3000, ()=>{
     console.log("The backend is running at the port 3000")
 });
