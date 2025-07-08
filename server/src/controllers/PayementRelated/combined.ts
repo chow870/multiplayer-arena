@@ -1,23 +1,35 @@
-import '../../env'
-import { Request, Response } from "express";
-import Razorpay from "razorpay";
-import crypto from "crypto";
-import prisma from "../../prisma/client";
+import dotenv from 'dotenv';
+import path from 'path';
+dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
+
+import { Request, Response } from 'express';
+import Razorpay from 'razorpay';
+import crypto from 'crypto';
+import prisma from '../../prisma/client';
+
 enum TransactionType {
   BuyPremium,
   Bet,
-  Topup
+  Topup,
 }
 
-// will have to fix it later on
-const razorpayInstance = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID!,
-  key_secret: process.env.RAZORPAY_KEY_SECRET!,
-});
+// ✅ Safely create Razorpay instance only when needed
+function createRazorpayInstance() {
+  const key_id = process.env.RAZORPAY_KEY_ID;
+  const key_secret = process.env.RAZORPAY_KEY_SECRET;
 
-export const getKeydetials = (req: Request, res: Response) => {
-  return res.status(200).json({ key: process.env.RAZORPAY_KEY_ID });
-};
+  if (!key_id || !key_secret) {
+    throw new Error('❌ Razorpay credentials are missing in .env');
+  }
+
+  return new Razorpay({ key_id, key_secret });
+}
+
+// ✅ For checking if .env is loaded (optional debug)
+console.log('[DEBUG] Razorpay Key ID:', process.env.RAZORPAY_KEY_ID);
+
+export const getKeyDetails = (req: Request, res: Response) => {
+  return res.status(200).json}
 
 export const createCheckoutOrder = async (req: Request, res: Response) => {
   try {
@@ -37,6 +49,7 @@ export const createCheckoutOrder = async (req: Request, res: Response) => {
     }
 
     // Create Razorpay order
+    const razorpayInstance = createRazorpayInstance();
     const order = await razorpayInstance.orders.create({
       amount: amount * 100, // amount in paise
       currency: "INR",
