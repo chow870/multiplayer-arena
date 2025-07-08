@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import prisma from '../../prisma/client';
 
+// DisplayFriends/displayFriends.ts
+
 export const getUserFriendships = async (req: Request, res: Response) => {
     const userId = (req as any).user.id; // Assuming you have middleware to set req.user.id
     console.log("reached the backend of getUserFriendships controller", userId);
@@ -19,17 +21,17 @@ export const getUserFriendships = async (req: Request, res: Response) => {
       });
   
       const pendingRequests = friendships.filter(
-        (f) => f.status === 'PENDING'
+        (f:any) => f.status === 'PENDING'
       );
   
       const acceptedFriends = friendships.filter(
-        (f) => f.status === 'ACCEPTED'
+        (f:any) => f.status === 'ACCEPTED'
       );
   
       const blockedUsers = friendships.filter(
-        (f) => f.status === 'BLOCKED'
+        (f:any) => f.status === 'BLOCKED'
       );
-      const pendingRequestsTOSend = pendingRequests.map((f) => {
+      const pendingRequestsTOSend = pendingRequests.map((f:any) => {
         return {
           id: f.id,
           senderid: f.sender.id,
@@ -41,7 +43,7 @@ export const getUserFriendships = async (req: Request, res: Response) => {
           status: f.status
         };
       });
-      const blockedUsersRequestsTOSend = blockedUsers.map((f) => {
+      const blockedUsersRequestsTOSend = blockedUsers.map((f:any) => {
         return {
           id: f.id,
           senderid: f.sender.id,
@@ -53,7 +55,7 @@ export const getUserFriendships = async (req: Request, res: Response) => {
           status: f.status
         };
       });
-      const acceptedFriendsRequestsTOSend = acceptedFriends.map((f) => {
+      const acceptedFriendsRequestsTOSend = acceptedFriends.map((f:any) => {
         return {
           id: f.id,
           senderid: f.sender.id,

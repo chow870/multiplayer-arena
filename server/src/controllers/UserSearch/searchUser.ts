@@ -38,7 +38,7 @@ export const getAllUsersForFriendRequest = async (req: Request, res: Response) =
                 senderId: true,
                 receiverId: true,
               }
-            }).then(data => data.map(friend => friend.senderId).concat(data.map(friend => friend.receiverId))))]
+            }).then((data:any) => data.map((friend:any) => friend.senderId).concat(data.map((friend:any) => friend.receiverId))))]
           }
         }
       }
