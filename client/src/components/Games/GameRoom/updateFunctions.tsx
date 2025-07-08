@@ -13,7 +13,7 @@ export const getWinner = async ({
     const token = localStorage.getItem('token');
 
     const response = await axios.get(
-      `/api/v1/games/Gamelobby/${gameId}/getWinner`,
+      `https://multiplayer-arena-1.onrender.com/api/v1/games/Gamelobby/${gameId}/getWinner`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -47,7 +47,7 @@ export const updateGameMove = async ({
     const token = localStorage.getItem('token');
 
     const response = await axios.patch(
-      `/api/v1/games/Gamelobby/${gameId}/updateGameState`,
+      `https://multiplayer-arena-1.onrender.com/api/v1/games/Gamelobby/${gameId}/updateGameState`,
       {
         currentState,
         currentPalyerId,

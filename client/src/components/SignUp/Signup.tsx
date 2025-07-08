@@ -24,7 +24,7 @@ function Signup() {
 
   async function SignupBackendHit() {
     try {
-      const response = await axios.post('/api/v1/signup', {
+      const response = await axios.post('https://multiplayer-arena-1.onrender.com/api/v1/signup', {
         username,
         email,
         password

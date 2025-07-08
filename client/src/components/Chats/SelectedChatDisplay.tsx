@@ -25,7 +25,7 @@ function SelectedChatDisplay() {
 
     const fetchMessages = async () => {
       try {
-        const res = await axios.get(`/api/v1/chats/${selectedChat}`, {
+        const res = await axios.get(`https://multiplayer-arena-1.onrender.com/api/v1/chats/${selectedChat}`, {
           headers: {
             "Content-Type": "application/json",
             authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -68,7 +68,7 @@ function SelectedChatDisplay() {
     try {
       // Send to backend to persist
       const res = await axios.post(
-        `/api/v1/chats/${selectedChat}`,
+        `https://multiplayer-arena-1.onrender.com/api/v1/chats/${selectedChat}`,
         {
           message: trimmedMessage,
         },

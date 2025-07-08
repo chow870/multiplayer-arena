@@ -28,7 +28,7 @@ const TransactionList = () => {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const res = await axios.get(`/api/v1/transactions`,{
+        const res = await axios.get(`https://multiplayer-arena-1.onrender.com/api/v1/transactions`,{
           headers: {
             authorization: `Bearer ${localStorage.getItem('token')}`,
           },

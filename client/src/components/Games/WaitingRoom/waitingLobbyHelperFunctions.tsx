@@ -13,7 +13,7 @@ export const expireWaitingRoom = async ({
   try {
    
     const response = await axios.patch(
-      `/api/v1/games/lobby/${lobbyId}/expireWaitingRoom`,
+      `https://multiplayer-arena-1.onrender.com/api/v1/games/lobby/${lobbyId}/expireWaitingRoom`,
       {},
       {
         headers: {
@@ -33,7 +33,7 @@ export async function deductAmount(lobbyId:string) {
 
   try {
     const response = await axios.patch(
-      `/api/v1/games/lobby/${lobbyId}/deductAmount`,
+      `https://multiplayer-arena-1.onrender.com/api/v1/games/lobby/${lobbyId}/deductAmount`,
       {},
       {
         headers: {

@@ -45,7 +45,7 @@ const AvatarUploader: React.FC<AvatarUploaderProps> = ({ onUpload }) => {
     formData.append("image", blob, "avatar.jpg");
 
     try {
-      const res = await axios.post("/api/v1/user/upload-avatar", formData, {
+      const res = await axios.post("https://multiplayer-arena-1.onrender.com/api/v1/user/upload-avatar", formData, {
         headers: { "Content-Type": "multipart/form-data" ,Authorization: `Bearer ${token}`,},
       });
 

@@ -10,7 +10,7 @@ function SinglePlayer() {
 
     async function GameBegin() {
         try {
-        const res = await axios.post('/api/games/create',{
+        const res = await axios.post('https://multiplayer-arena-1.onrender.com/api/games/create',{
         gameType : selectedGame,
         gameMode : gameMode,
         invitedUserIds : [], // If no invited player, send empty array

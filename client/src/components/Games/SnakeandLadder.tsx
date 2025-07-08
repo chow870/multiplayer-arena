@@ -38,7 +38,7 @@ const SnakeLadder: React.FC<Props> = ({
     const token = localStorage.getItem('token');
 
     const response = await axios.patch(
-      `/api/v1/games/Gamelobby/${gameId}/updateGameState`,
+      `https://multiplayer-arena-1.onrender.com/api/v1/games/Gamelobby/${gameId}/updateGameState`,
       {
         currentState : gameState,
         currentPalyerId: myId,

@@ -20,7 +20,7 @@ function FriendRequests() {
     async function fetchFriendships() {
       try {
         console.log("going to hit the backend api to fetch the friendships");
-        const response = await axios.get("/api/v1/friendships", {
+        const response = await axios.get("https://multiplayer-arena-1.onrender.com/api/v1/friendships", {
           headers: {
             "Content-Type": "application/json",
             authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -47,7 +47,7 @@ function FriendRequests() {
         friendId,
       );
       await axios.post(
-        `/api/v1/friend-request/accept`,
+        `https://multiplayer-arena-1.onrender.com/api/v1/friend-request/accept`,
         { friendId: friendId },
         {
           headers: {
@@ -77,7 +77,7 @@ function FriendRequests() {
   const handleBlockRequest = async (friendId: string | any) => {
     try {
       await axios.post(
-        `/api/v1/friend-request/block`,
+        `https://multiplayer-arena-1.onrender.com/api/v1/friend-request/block`,
         { friendId: friendId },
         {
           headers: {

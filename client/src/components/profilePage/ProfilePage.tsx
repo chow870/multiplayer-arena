@@ -27,7 +27,7 @@ const UserProfile = () => {
 
   useEffect(() => {
     // Fetch current user (adjust endpoint if needed)
-    axios.get("/api/v1/user/profile",{
+    axios.get("https://multiplayer-arena-1.onrender.com/api/v1/user/profile",{
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -48,7 +48,7 @@ const UserProfile = () => {
 
   const handleUpdate = async () => {
     try {
-      await axios.patch("/api/v1/user/profile",form,{
+      await axios.patch("https://multiplayer-arena-1.onrender.com/api/v1/user/profile",form,{
         headers: {
           Authorization: `Bearer ${token}`,
         },

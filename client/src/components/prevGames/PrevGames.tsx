@@ -33,7 +33,7 @@ const GameRecordList = () => {
     console.log('the token is', localStorage.getItem('token'));
     const fetchRecords = async () => {
       try {
-        const res = await axios.get("/api/v1/gamerecords", {
+        const res = await axios.get("https://multiplayer-arena-1.onrender.com/api/v1/gamerecords", {
           headers: {
             authorization: `Bearer ${localStorage.getItem('token')}`,
           },

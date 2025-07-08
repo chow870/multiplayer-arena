@@ -22,7 +22,7 @@ function ReceivedInvites() {
 
     async function fetchInvites() {
       try {
-        const res = await axios.get('/api/v1/games/invites', {
+        const res = await axios.get('https://multiplayer-arena-1.onrender.com/api/v1/games/invites', {
           headers: {
             'authorization': `Bearer ${localStorage.getItem('token')}`,
           },
@@ -44,7 +44,7 @@ function ReceivedInvites() {
 
   const handleReject = async (lobbyId: string) => {
     try {
-      await axios.delete(`/api/v1/games/lobby/${lobbyId}`, {
+      await axios.delete(`https://multiplayer-arena-1.onrender.com/api/v1/games/lobby/${lobbyId}`, {
         headers: {
           'authorization': `Bearer ${localStorage.getItem('token')}`,
         },

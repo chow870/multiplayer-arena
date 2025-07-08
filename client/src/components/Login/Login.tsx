@@ -22,7 +22,7 @@ function Login() {
 
     async function LoginBackendHit() {
         try {
-            const response = await axios.post('/api/v1/login', { email, password });
+            const response = await axios.post('https://multiplayer-arena-1.onrender.com/api/v1/login', { email, password });
 
             if (response.status === 200 || response.status === 201) {
                 localStorage.setItem("token", response.data.token);

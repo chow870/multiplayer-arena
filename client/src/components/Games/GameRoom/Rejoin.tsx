@@ -29,7 +29,7 @@ function Rejoin() {
     const fetchGameLobby = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`/api/v1/games/Gamelobby/${gameLobbyId}/details`, {
+        const res = await axios.get(`https://multiplayer-arena-1.onrender.com/api/v1/games/Gamelobby/${gameLobbyId}/details`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },

@@ -72,7 +72,7 @@ export default function MainBlog() {
   const fetchAllBlogs = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`/api/v1/blog/blogs?page=${page}&limit=10`, {
+      const res = await axios.get(`https://multiplayer-arena-1.onrender.com/api/v1/blog/blogs?page=${page}&limit=10`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setAllBlogs(res.data.blogs);
@@ -87,7 +87,7 @@ export default function MainBlog() {
   const fetchMyBlogs = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("/api/v1/blog/my/blogs", {
+      const res = await axios.get("https://multiplayer-arena-1.onrender.com/api/v1/blog/my/blogs", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setMyBlogs(res.data);
@@ -101,7 +101,7 @@ export default function MainBlog() {
   const fetchComments = async (blogId: string) => {
     try {
       const res = await axios.get(
-        `/api/v1/blog/blogs/${blogId}/comments?page=${commentsPage}&limit=5`,
+        `https://multiplayer-arena-1.onrender.com/api/v1/blog/blogs/${blogId}/comments?page=${commentsPage}&limit=5`,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         },
@@ -119,7 +119,7 @@ export default function MainBlog() {
     try {
       const content = editor.getJSON();
       await axios.post(
-        "/api/v1/blog/blogs",
+        "https://multiplayer-arena-1.onrender.com/api/v1/blog/blogs",
         { title, content },
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -141,7 +141,7 @@ export default function MainBlog() {
     if (!selectedBlog || !newComment.trim()) return;
     try {
       await axios.post(
-        `/api/v1/blog/blogs/${selectedBlog.id}/comments`,
+        `https://multiplayer-arena-1.onrender.com/api/v1/blog/blogs/${selectedBlog.id}/comments`,
         {
           blogId: selectedBlog.id,
           content: {
@@ -170,7 +170,7 @@ export default function MainBlog() {
     if (!selectedBlog) return;
     try {
       const res = await axios.post(
-        `/api/v1/blog/blogs/${selectedBlog.id}/react`,
+        `https://multiplayer-arena-1.onrender.com/api/v1/blog/blogs/${selectedBlog.id}/react`,
         { type },
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },

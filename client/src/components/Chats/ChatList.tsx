@@ -32,7 +32,7 @@ function ChatList() {
   useEffect(() => {
     async function fetchFriendships() {
       try {
-        const response = await axios.get("/api/v1/friendships", {
+        const response = await axios.get("https://multiplayer-arena-1.onrender.com/api/v1/friendships", {
           headers: {
             "Content-Type": "application/json",
             authorization: `Bearer ${localStorage.getItem("token")}`,

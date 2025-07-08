@@ -20,7 +20,7 @@ function VerifyEmail() {
 
     async function GenerateOTP() {
         try {
-            let response = await axios.post("/api/v1/sendotp", { email });
+            let response = await axios.post("https://multiplayer-arena-1.onrender.com/api/v1/sendotp", { email });
             console.log(response.data);
             setDisplaySecondPart(true);
             setIsError(false);
@@ -33,7 +33,7 @@ function VerifyEmail() {
 
     async function VerifyOTP() {
         try {
-            let response = await axios.post("/api/v1/verifyotp", { email, otp });
+            let response = await axios.post("https://multiplayer-arena-1.onrender.com/api/v1/verifyotp", { email, otp });
             console.log(response.data);
             navigate("/login");
         } catch (error) {

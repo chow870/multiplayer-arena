@@ -22,7 +22,7 @@ function Navbar() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        let res = await axios.get("/api/v1/user/profile", {
+        let res = await axios.get("https://multiplayer-arena-1.onrender.com/api/v1/user/profile", {
           headers: {
             Authorization: `Bearer ${token}`,
           },

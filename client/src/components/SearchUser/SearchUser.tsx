@@ -18,7 +18,7 @@ function SearchUsers() {
       setLoading(true);
       axios
         .post(
-          "/api/v1/search-users",
+          "https://multiplayer-arena-1.onrender.com/api/v1/search-users",
           { username: searchTerm }, // <-- actual request body
           {
             headers: {
@@ -44,7 +44,7 @@ function SearchUsers() {
   const RequestToadd = async (userId: string) => {
     try {
       const response = await axios.post(
-        "/api/v1/add-friend",
+        "https://multiplayer-arena-1.onrender.com/api/v1/add-friend",
         { friendId: userId },
         {
           headers: {

@@ -16,7 +16,7 @@ function Balance() {
   useEffect(() => {
     const fetchBalance = async () => {
       try {
-        const res = await axios.get("/api/v1/pay/balance", {
+        const res = await axios.get("https://multiplayer-arena-1.onrender.com/api/v1/pay/balance", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },

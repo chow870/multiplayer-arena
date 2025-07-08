@@ -25,7 +25,7 @@ function FriendMode() {
     (async () => {
       try {
         setIsLoading(true);
-        const  resp  = await axios.get('/api/v1/friendships', {
+        const  resp  = await axios.get('https://multiplayer-arena-1.onrender.com/api/v1/friendships', {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
         });
         // Transform to user objects, excluding yourself
@@ -67,7 +67,7 @@ function FriendMode() {
     try {
       // 1) Create Game Lobby : 
       const { data: create } = await axios.post(
-        '/api/v1/games/createGame',
+        'https://multiplayer-arena-1.onrender.com/api/v1/games/createGame',
         { invitedUserIds: selectedIds, gameType,betAmount },
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
@@ -76,7 +76,7 @@ function FriendMode() {
 
       // 2) Send invites
       let resp = await axios.post(
-        '/api/v1/games/invite',
+        'https://multiplayer-arena-1.onrender.com/api/v1/games/invite',
         { invitedUserIds: selectedIds, gameMode :"FRIEND",gameLobbyId: lobbyId,betAmount },
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );

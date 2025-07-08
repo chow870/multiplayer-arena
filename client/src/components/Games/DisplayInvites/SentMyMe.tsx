@@ -23,7 +23,7 @@ function SentMyMe() {
 
     async function fetchSentInvites() {
       try {
-        const res = await axios.get('/api/v1/games/sent-invites', {
+        const res = await axios.get('https://multiplayer-arena-1.onrender.com/api/v1/games/sent-invites', {
           headers: {
             authorization: `Bearer ${localStorage.getItem('token')}`,
           },
@@ -45,7 +45,7 @@ function SentMyMe() {
 
   const handleJoinLobby = async (lobbyId: string) => {
   try {
-    const res = await axios.post(`/api/v1/games/lobby/${lobbyId}/join`, {}, {
+    const res = await axios.post(`https://multiplayer-arena-1.onrender.com/api/v1/games/lobby/${lobbyId}/join`, {}, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
       },
@@ -62,7 +62,7 @@ function SentMyMe() {
 
   const handleCancelInvite = async (lobbyId: string) => {
     try {
-      await axios.delete(`/api/v1/games/lobby/${lobbyId}`, {
+      await axios.delete(`https://multiplayer-arena-1.onrender.com/api/v1/games/lobby/${lobbyId}`, {
         headers: {
           authorization: `Bearer ${localStorage.getItem('token')}`,
         },

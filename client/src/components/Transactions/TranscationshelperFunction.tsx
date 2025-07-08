@@ -19,13 +19,13 @@ export default async function checkout({ amount, type }: Transaction) {
     if(amount <=0) return ;
     console.log(`Processing ${type} transaction for amount: ${amount}`);
     try{
-        const { data: { key } } = await axios.get("/api/v1/pay/getkey", {
+        const { data: { key } } = await axios.get("https://multiplayer-arena-1.onrender.com/api/v1/pay/getkey", {
          headers: {
           Authorization: `Bearer ${token}`,
         },
         })
         console.log("the key received is helper function is : ", key)
-        const { data: { order } } = await axios.post("/api/v1/pay/checkout", {
+        const { data: { order } } = await axios.post("https://multiplayer-arena-1.onrender.com/api/v1/pay/checkout", {
             amount,
             type
         },{
@@ -42,7 +42,7 @@ export default async function checkout({ amount, type }: Transaction) {
             description: "Tutorial of RazorPay",
             image: "https://avatars.githubusercontent.com/u/150316743?s=400&v=4",
             order_id: order.id,
-            callback_url: "http://localhost:3000/api/v1/pay/paymentverification",
+            callback_url: "https://multiplayer-arena-1.onrender.com/api/v1/pay/paymentverification",
             prefill: {
                 name: "Aditya Choudhary",
                 email: "aditya.choudhary@example.com",
