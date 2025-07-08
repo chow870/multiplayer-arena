@@ -203,3 +203,8 @@ model VerifyEmail {
 
   @@index([email, status]) // quick lookups
 }
+
+
+
+ // "prisma": "prisma",
+  // "migrate": "prisma migrate dev",
